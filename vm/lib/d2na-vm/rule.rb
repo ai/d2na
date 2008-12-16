@@ -27,9 +27,32 @@ module D2NA
     # case letter (for example, <tt>:Input</tt>).
     attr_reader :conditions
     
-    # Create D²NA rule with special conditions.
-    def initialize(conditions)
+    # Array of block commands (<tt>[:type, :name]</tt>). Type can be
+    # <tt>:up</tt>, <tt>:down</tt> (increment/decrement state) or <tt>:send</tt>
+    # (send output signal). Name should be state or output signal name.
+    attr_reader :commands
+    
+    # Create D²NA rule with special conditions. In block you can call +up+,
+    # +down+ and +send+ methods to add commands.
+    def initialize(conditions, &block)
       @conditions = conditions
+      @commands = []
+      instance_eval(&block) if block_given?
+    end
+    
+    # Add command to increment +state+.
+    def up(state)
+      @commands << [:up, state]
+    end
+    
+    # Add command to decrement +state+.
+    def down(state)
+      @commands << [:down, state]
+    end
+    
+    # Add command to send output +signal+.
+    def send(signal)
+      @commands << [:send, signal]
     end
   end
 end

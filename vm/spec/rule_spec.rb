@@ -7,4 +7,13 @@ describe D2NA::Rule do
     rule.conditions.should == [:Input, :state]
   end
   
+  it "should store commands" do
+    rule = D2NA::Rule.new [:Input, :state] do
+      up :state
+      down :state
+      send :Output
+    end
+    rule.commands.should == [[:up, :state], [:down, :state], [:send, :Output]]
+  end
+  
 end
