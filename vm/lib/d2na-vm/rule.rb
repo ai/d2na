@@ -22,5 +22,14 @@ module D2NA
   # which will be executed on special condition (input signals and non-zero
   # states).
   class Rule
+    # Array of names (Symbol) of input signals and non-zero states which is
+    # neccessary to start this code. Input signals name must start from upper
+    # case letter (for example, <tt>:Input</tt>).
+    attr_reader :conditions
+    
+    # Create D²NA rule with special conditions.
+    def initialize(conditions)
+      @conditions = conditions
+    end
   end
 end
