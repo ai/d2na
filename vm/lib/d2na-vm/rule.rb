@@ -1,5 +1,5 @@
 =begin
-Main file to load all neccessary classes for D²NA.
+Block of D²NA code.
 
 Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pathname'
-
-dir = Pathname(__FILE__).dirname.expand_path + 'd2na-vm'
-require dir + 'rule'
+module D2NA
+  # Block of D²NA code. Contain commands (output signals and state changes), 
+  # which will be executed on special condition (input signals and non-zero
+  # states).
+  class Rule
+  end
+end
