@@ -11,10 +11,11 @@ end
 
 desc 'RCov'
 Spec::Rake::SpecTask.new('rcov') do |t|
-  t.spec_opts = ['--format', 'specdoc', '--colour']
+  t.spec_opts = ['--colour']
   t.spec_files = Dir['spec/**/*_spec.rb'].sort
   t.libs = ['lib']
   t.rcov = true
+  t.rcov_opts = ['--text-summary']
 end
 
 Rake::RDocTask.new do |rdoc|
