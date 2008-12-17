@@ -41,7 +41,12 @@ module D2NA
       @conditions = conditions
       @owner = owner
       @commands = []
+      @output = []
       instance_eval(&block) if block_given?
+      if @owner
+        @owner.input(*@conditions.reject { |c| c.to_s =~ /^[^A-Z]/ })
+        @owner.output(*@output)
+      end
     end
     
     # Add command to increment +state+.
@@ -56,6 +61,7 @@ module D2NA
     
     # Add command to send output +signal+.
     def send(signal)
+      @output << signal
       @commands << [:send, signal]
     end
   end

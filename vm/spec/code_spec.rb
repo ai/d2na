@@ -47,4 +47,17 @@ describe D2NA::Code do
     code.output_signals.should == [:One, :Two]
   end
   
+  it "should autodetect usaged signals" do
+    code = D2NA::Code.new do
+      on :Input, :state do
+        down :state
+        send :Output
+        up :state
+      end
+    end
+    
+    code.input_signals.should == [:Input]
+    code.output_signals.should == [:Output]
+  end
+  
 end
