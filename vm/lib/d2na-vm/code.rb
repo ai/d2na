@@ -21,5 +21,22 @@ module D2NA
   # D²NA code with several Rule blocks. Receive and send signals and store state
   # values.
   class Code
+    # Array of Rule with conditions and commands.
+    attr_reader :rules
+    
+    # Create D²NA code. Block will be eval on new instance.
+    def initialize(&block)
+      @rules = []
+      instance_eval(&block) if block_given?
+    end
+    
+    # Add new Rule with special +conditions+ of input signals and non-zero
+    # states which is neccessary to start this code. Input signals name must
+    # start from upper case letter (for example, <tt>:Input</tt>). Block will be
+    # eval on rule, so you can set commands by +up+, +down+ and +send+ Rule
+    # methods.
+    def on(*conditions, &block)
+      @rules << Rule.new(conditions, &block)
+    end
   end
 end
