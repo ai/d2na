@@ -16,4 +16,19 @@ describe D2NA::Rule do
     rule.commands.should == [[:up, :state], [:down, :state], [:send, :Output]]
   end
   
+  it "should run commands on owner" do
+    code = mock('code', :null_object => true)
+    
+    code.should_receive(:state_up).with(:state).ordered
+    code.should_receive(:send_out).with(:Output).ordered
+    code.should_receive(:state_down).with(:state).ordered
+    
+    rule = D2NA::Rule.new [], code do
+      up :state
+      send :Output
+      down :state
+    end
+    rule.call
+  end
+  
 end

@@ -44,18 +44,19 @@ module D2NA
       @output = []
       @states = []
       instance_eval(&block) if block_given?
+      
       if @owner
-        @conditions.each do |condition|
-          if condition.to_s =~ /^[A-Z]/
-            @owner.input condition
-          else
-            @owner.state condition
+        @owner.input *(@conditions.reject do |condition|
+          unless condition.to_s =~ /^[A-Z]/
+            @states << condition
           end
-        end
+        end)
         @owner.output(*@output)
         @owner.state(*@states)
       end
       @output = @states = nil
+      
+      compile
     end
     
     # Add command to increment +state+.
@@ -74,6 +75,24 @@ module D2NA
     def send(signal)
       @output << signal
       @commands << [:send, signal]
+    end
+    
+    # Compile commands to Proc.
+    def compile
+      methods = Hash.new('').merge!(
+        { :send => 'send_out', :up => 'state_up', :down => 'state_down' })
+      @compiled = eval(
+        @commands.inject('proc {') do |code, command|
+          type, name = command
+          next if Symbol != name.class
+          code + methods[type] + " :#{name}\n"
+        end +
+      '}')
+    end
+    
+    # Run commands on owner
+    def call
+      @owner.instance_eval(&@compiled)
     end
   end
 end
