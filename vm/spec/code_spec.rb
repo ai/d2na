@@ -112,7 +112,7 @@ describe D2NA::Code do
   end
   
   it "should run rule on input signal" do
-    code = D2NA::Code.new do
+    code = RecorderCode.new do
       on :Input do
         send :One
       end
@@ -121,13 +121,8 @@ describe D2NA::Code do
       end
     end
     
-    mock = mock('listener')
-    mock.should_receive(:one).with(code, :One)
-    mock.should_not_receive(:two)
-    code.listen :One, &mock.method(:one)
-    code.listen :Two, &mock.method(:two)
-    
     code.send_in :Input
+    code.out.should == [:One]
   end
   
 end
