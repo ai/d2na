@@ -25,4 +25,26 @@ describe D2NA::Code do
     code.rules[1].commands.should == [[:down, :state]]
   end
   
+  it "should add new input signal" do
+    code = D2NA::Code.new do
+      input :One, :Two
+      input :One
+    end
+    code.input_signals.should == [:One, :Two]
+  end
+  
+  it "should raise error if input signal isn't capitalized" do
+    code = D2NA::Code.new
+    lambda {
+      code.input :bad
+    }.should raise_error ArgumentError, /capitalized/
+  end
+  
+  it "should add new output signal" do
+    code = D2NA::Code.new do
+      output :One, :One, :Two
+    end
+    code.output_signals.should == [:One, :Two]
+  end
+  
 end

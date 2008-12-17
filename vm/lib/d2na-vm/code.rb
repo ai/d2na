@@ -24,17 +24,43 @@ module D2NA
     # Array of Rule with conditions and commands.
     attr_reader :rules
     
+    # Input signals, which this Code can receive. To add one use +input+ method.
+    attr_reader :input_signals
+    
+    # Input signals, which this Code may send. To add one use +output+ method.
+    attr_reader :output_signals
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @rules = []
+      @input_signals = []
+      @output_signals = []
       instance_eval(&block) if block_given?
+    end
+    
+    # Add new input +signals+. Input signals name must start from upper case
+    # letter (for example, <tt>:Input</tt>).
+    def input(*signals)
+      signals.each do |signal|
+        next if @input_signals.include? signal
+        unless signal.to_s =~ /^[A-Z]/
+          raise ArgumentError, 'Signal name must be capitalized'
+        end
+        @input_signals << signal
+      end
+    end
+    
+    # Add new output +signals+.
+    def output(*signals)
+      signals.each do |signal|
+        @output_signals << signal unless @output_signals.include? signal
+      end
     end
     
     # Add new Rule with special +conditions+ of input signals and non-zero
     # states which is neccessary to start this code. Input signals name must
-    # start from upper case letter (for example, <tt>:Input</tt>). Block will be
-    # eval on rule, so you can set commands by +up+, +down+ and +send+ Rule
-    # methods.
+    # start from upper case letter Block will be eval on rule, so you can set
+    # commands by +up+, +down+ and +send+ Rule methods.
     def on(*conditions, &block)
       @rules << Rule.new(conditions, self, &block)
     end
