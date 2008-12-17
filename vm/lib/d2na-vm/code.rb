@@ -53,9 +53,7 @@ module D2NA
     def input(*signals)
       signals.each do |signal|
         next if @input_signals.include? signal
-        unless signal.to_s =~ /^[A-Z]/
-          raise ArgumentError, 'Signal name must be capitalized'
-        end
+        check_signal_name(signal)
         @input_signals << signal
         @conditions_cache[signal] = []
       end
@@ -112,6 +110,15 @@ module D2NA
       @listeners_all.each { |i| i.call(self, signal) }
       if listeners = @listeners_signals[signal]
         listeners.each { |i| i.call(self, signal) }
+      end
+    end
+    
+    protected
+    
+    # Check, that +signal+ name start from upper case letter.
+    def check_signal_name(signal)
+      unless signal.to_s =~ /^[A-Z]/
+        raise ArgumentError, 'Signal name must be capitalized'
       end
     end
   end
