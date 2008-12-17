@@ -45,10 +45,17 @@ module D2NA
       @states = []
       instance_eval(&block) if block_given?
       if @owner
-        @owner.input(*@conditions.reject { |c| c.to_s =~ /^[^A-Z]/ })
+        @conditions.each do |condition|
+          if condition.to_s =~ /^[A-Z]/
+            @owner.input condition
+          else
+            @owner.state condition
+          end
+        end
         @owner.output(*@output)
         @owner.state(*@states)
       end
+      @output = @states = nil
     end
     
     # Add command to increment +state+.

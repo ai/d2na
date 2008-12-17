@@ -33,12 +33,16 @@ module D2NA
     # Hash of states with name (Symbol) as key and it value (Number) as value.
     attr_reader :states
     
+    # Hash with condition as key and dependency rule as value.
+    attr_reader :conditions_cache
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @rules = []
       @input_signals = []
       @output_signals = []
       @states = {}
+      @conditions_cache = {}
       instance_eval(&block) if block_given?
     end
     
@@ -51,6 +55,7 @@ module D2NA
           raise ArgumentError, 'Signal name must be capitalized'
         end
         @input_signals << signal
+        @conditions_cache[signal] = []
       end
     end
     
@@ -66,7 +71,10 @@ module D2NA
     # start from upper case letter. Block will be eval on rule, so you can set
     # commands by +up+, +down+ and +send+ Rule methods.
     def on(*conditions, &block)
-      @rules << Rule.new(conditions, self, &block)
+      rule = Rule.new(conditions, self, &block)
+      @rules << rule
+      rule.conditions.each { |c| @conditions_cache[c] << rule }
+      rule
     end
     
     # Define +states+. State name must start from lower case latter
@@ -77,6 +85,7 @@ module D2NA
           raise ArgumentError, 'State name must not be capitalized'
         end
         @states[name] = 0 unless @states.has_key? name
+        @conditions_cache[name] = []
       end
     end
   end

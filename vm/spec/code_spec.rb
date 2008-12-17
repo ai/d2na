@@ -75,4 +75,22 @@ describe D2NA::Code do
     code.states.keys.should == [:state]
   end
   
+  it "should create conditions cache" do
+    code = D2NA::Code.new do
+      input :Big
+      state :one
+      on :Small, :one, :two do
+        up :three
+      end
+    end
+    
+    code.conditions_cache.should == {
+      :Big   => [],
+      :Small => [code.rules.first],
+      :one   => [code.rules.first],
+      :two   => [code.rules.first],
+      :three => []
+    }
+  end
+  
 end
