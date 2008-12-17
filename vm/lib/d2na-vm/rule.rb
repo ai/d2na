@@ -32,10 +32,14 @@ module D2NA
     # (send output signal). Name should be state or output signal name.
     attr_reader :commands
     
-    # Create D²NA rule with special conditions. In block you can call +up+,
-    # +down+ and +send+ methods to add commands.
-    def initialize(conditions, &block)
+    # Code, which store state value and receive and send signals for this rule.
+    attr_accessor :owner
+    
+    # Create D²NA rule for +owner+ Code with special +conditions+. In block you
+    # can call +up+, +down+ and +send+ methods to add commands.
+    def initialize(conditions, owner, &block)
       @conditions = conditions
+      @owner = owner
       @commands = []
       instance_eval(&block) if block_given?
     end

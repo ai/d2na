@@ -36,7 +36,7 @@ module D2NA
     # eval on rule, so you can set commands by +up+, +down+ and +send+ Rule
     # methods.
     def on(*conditions, &block)
-      @rules << Rule.new(conditions, &block)
+      @rules << Rule.new(conditions, self, &block)
     end
   end
 end
