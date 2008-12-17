@@ -35,10 +35,14 @@ module D2NA
     # Code, which store state value and receive and send signals for this rule.
     attr_accessor :owner
     
+    # How many conditions aren’t satisfied.
+    attr_accessor :required
+    
     # Create D²NA rule for +owner+ Code with special +conditions+. In block you
     # can call +up+, +down+ and +send+ methods to add commands.
     def initialize(conditions, owner, &block)
       @conditions = conditions
+      @required = conditions.length
       @owner = owner
       @commands = []
       @output = []

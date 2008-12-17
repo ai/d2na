@@ -111,4 +111,23 @@ describe D2NA::Code do
     code.send_out :One
   end
   
+  it "should run rule on input signal" do
+    code = D2NA::Code.new do
+      on :Input do
+        send :One
+      end
+      on :Input, :state do
+        send :Two
+      end
+    end
+    
+    mock = mock('listener')
+    mock.should_receive(:one).with(code, :One)
+    mock.should_not_receive(:two)
+    code.listen :One, &mock.method(:one)
+    code.listen :Two, &mock.method(:two)
+    
+    code.send_in :Input
+  end
+  
 end

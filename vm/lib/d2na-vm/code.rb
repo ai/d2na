@@ -104,6 +104,16 @@ module D2NA
         end
       end
     end
+
+    # Send input +signal+ into Code. Signals name must start from upper case
+    # letter.
+    def send_in(signal)
+      check_signal_name(signal)
+      @conditions_cache[signal].each do |rule|
+        rule.call if 1 == rule.required
+      end
+    end
+    alias << send
     
     # Send output +signal+ from Code to listeners.
     def send_out(signal)
