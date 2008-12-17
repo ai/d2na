@@ -93,4 +93,22 @@ describe D2NA::Code do
     }
   end
   
+  it "should send output signals to listeners" do
+    code = D2NA::Code.new
+    code.output :One, :Two
+    
+    mock = mock('listener')
+    mock.should_receive(:one).with(code, :One)
+    mock.should_receive(:both).with(code, :One)
+    mock.should_receive(:all).with(code, :One)
+    mock.should_not_receive(:two)
+    
+    code.listen :One, &mock.method(:one)
+    code.listen :Two, &mock.method(:two)
+    code.listen :One, :Two, &mock.method(:both)
+    code.listen &mock.method(:all)
+    
+    code.send_out :One
+  end
+  
 end

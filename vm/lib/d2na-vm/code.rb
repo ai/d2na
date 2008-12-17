@@ -43,6 +43,8 @@ module D2NA
       @output_signals = []
       @states = {}
       @conditions_cache = {}
+      @listeners_all = []
+      @listeners_signals = {}
       instance_eval(&block) if block_given?
     end
     
@@ -86,6 +88,30 @@ module D2NA
         end
         @states[name] = 0 unless @states.has_key? name
         @conditions_cache[name] = []
+      end
+    end
+    
+    # Set block to listen some +signals+ (names or nil for all). First argument
+    # of block will be this Code, second - signal name.
+    def listen(*signals, &block)
+      if signals.empty?
+        @listeners_all << block
+      else
+        signals.each do |signal|
+          if @listeners_signals.has_key? signal
+            @listeners_signals[signal] << block
+          else
+            @listeners_signals[signal] = [block]
+          end
+        end
+      end
+    end
+    
+    # Send output +signal+ from Code to listeners.
+    def send_out(signal)
+      @listeners_all.each { |i| i.call(self, signal) }
+      if listeners = @listeners_signals[signal]
+        listeners.each { |i| i.call(self, signal) }
       end
     end
   end
