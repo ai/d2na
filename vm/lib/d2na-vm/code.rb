@@ -27,14 +27,18 @@ module D2NA
     # Input signals, which this Code can receive. To add one use +input+ method.
     attr_reader :input_signals
     
-    # Input signals, which this Code may send. To add one use +output+ method.
+    # Output signals, which this Code may send. To add one use +output+ method.
     attr_reader :output_signals
+    
+    # Hash of states with name (Symbol) as key and it value (Number) as value.
+    attr_reader :states
     
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @rules = []
       @input_signals = []
       @output_signals = []
+      @states = {}
       instance_eval(&block) if block_given?
     end
     
@@ -59,10 +63,21 @@ module D2NA
     
     # Add new Rule with special +conditions+ of input signals and non-zero
     # states which is neccessary to start this code. Input signals name must
-    # start from upper case letter Block will be eval on rule, so you can set
+    # start from upper case letter. Block will be eval on rule, so you can set
     # commands by +up+, +down+ and +send+ Rule methods.
     def on(*conditions, &block)
       @rules << Rule.new(conditions, self, &block)
+    end
+    
+    # Define +states+. State name must start from lower case latter
+    # (for example, <tt>:state</tt>).
+    def state(*states)
+      states.each do |name|
+        if name.to_s =~ /^[A-Z]/
+          raise ArgumentError, 'State name must not be capitalized'
+        end
+        @states[name] = 0 unless @states.has_key? name
+      end
     end
   end
 end

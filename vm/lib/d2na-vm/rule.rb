@@ -42,20 +42,24 @@ module D2NA
       @owner = owner
       @commands = []
       @output = []
+      @states = []
       instance_eval(&block) if block_given?
       if @owner
         @owner.input(*@conditions.reject { |c| c.to_s =~ /^[^A-Z]/ })
         @owner.output(*@output)
+        @owner.state(*@states)
       end
     end
     
     # Add command to increment +state+.
     def up(state)
+      @states << state
       @commands << [:up, state]
     end
     
     # Add command to decrement +state+.
     def down(state)
+      @states << state
       @commands << [:down, state]
     end
     

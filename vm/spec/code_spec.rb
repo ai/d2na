@@ -37,7 +37,7 @@ describe D2NA::Code do
     code = D2NA::Code.new
     lambda {
       code.input :bad
-    }.should raise_error ArgumentError, /capitalized/
+    }.should raise_error ArgumentError, /must be capitalized/
   end
   
   it "should add new output signal" do
@@ -47,7 +47,21 @@ describe D2NA::Code do
     code.output_signals.should == [:One, :Two]
   end
   
-  it "should autodetect usaged signals" do
+  it "should add new state" do
+    code = D2NA::Code.new do
+      state :state
+    end
+    code.states.keys.should == [:state]
+  end
+  
+  it "should raise error if state if capitalized" do
+    code = D2NA::Code.new
+    lambda {
+      code.state :Bad
+    }.should raise_error ArgumentError, /must not be capitalized/
+  end
+  
+  it "should autodetect usaged signals and states" do
     code = D2NA::Code.new do
       on :Input, :state do
         down :state
@@ -58,6 +72,7 @@ describe D2NA::Code do
     
     code.input_signals.should == [:Input]
     code.output_signals.should == [:Output]
+    code.states.keys.should == [:state]
   end
   
 end
