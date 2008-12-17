@@ -59,6 +59,13 @@ module D2NA
       compile
     end
     
+    # Run commands on owner
+    def call
+      @owner.instance_eval(&@compiled)
+    end
+    
+    protected
+    
     # Add command to increment +state+.
     def up(state)
       @states << state
@@ -88,11 +95,6 @@ module D2NA
           code + methods[type] + " :#{name}\n"
         end +
       '}')
-    end
-    
-    # Run commands on owner
-    def call
-      @owner.instance_eval(&@compiled)
     end
   end
 end
