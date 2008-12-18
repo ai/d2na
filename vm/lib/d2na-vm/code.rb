@@ -36,6 +36,10 @@ module D2NA
     # Hash with condition as key and dependency rule as value.
     attr_reader :conditions_cache
     
+    # Infinite recursion protection. How many levels of rule with only states in
+    # condition will be run.
+    attr_accessor :max_depth
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @rules = []
@@ -43,6 +47,7 @@ module D2NA
       @output_signals = []
       @states = {}
       @conditions_cache = {}
+      @max_depth = 100
       input :Init
       reset!
       instance_eval(&block) if block_given?
@@ -120,7 +125,8 @@ module D2NA
       end
       
       rule_to_run = {}
-      while not @diff.empty? or not rule_to_run.empty?
+      @max_depth.times do
+        break if @diff.empty? and rule_to_run.empty?
         @diff.each_pair do |state, diff|
           @conditions_cache[state].each do |rule|
             rule.required -= diff

@@ -239,4 +239,16 @@ describe D2NA::Code do
     code.states[:memory].should == 2
   end
   
+  it "should be protected from infinite recursion" do
+    code = RecorderCode.new do
+      on :Init do
+        up :infinity
+      end
+      on :infinity do
+        up :infinity
+      end
+    end
+    code.start
+  end
+  
 end
