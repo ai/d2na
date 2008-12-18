@@ -20,6 +20,51 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 module D2NA
   # D²NA code with several Rule blocks. Receive and send signals and store state
   # values.
+  #
+  # To create new code set to +new+ method block with calling +on+ methods for
+  # each rule. In it argument you can set conditions of input signals and states
+  # to run rule. Input signals name must start from upper case letter. To +on+
+  # method you must set block with calling +up+, +down+ or +send+ methods to add
+  # commands to rule to increment/decrement states or send output signal.
+  #
+  # You can set signals and state, that you will be using in code by +input+,
+  # +output+ and +state+ methods. If you didn’t set in manually, Code will
+  # detect it automatically by rules conditions and commands.
+  #
+  # To listen output signals you can set special procedure by +listen+ method.
+  # You can specify signals in method arguments or didn’t set them for all
+  # signals. First argument of listener procedure will be this Code and second -
+  # output signal name.
+  #
+  # == Example
+  # 
+  #   code = D2NA::Code.new do
+  #     input  :Print
+  #     output :Ping, :Pong
+  #     state  :ping, :pong
+  #     
+  #     on :Init {
+  #       up :ping
+  #     }
+  #     on :Print, :ping {
+  #       send :Ping
+  #       down :ping
+  #       up :pong
+  #     }
+  #     on :Print, :pong {
+  #       send :Pong
+  #       down :pong
+  #       up :ping
+  #     }
+  #   end
+  #   
+  #   code.listen do |code, signal|
+  #     p signal
+  #   end
+  #   
+  #   code << :Input  # will print "ping"
+  #   code << :Input  # will print "pong"
+  #   code << :Input  # will print "ping"
   class Code
     # Array of Rule with conditions and commands.
     attr_reader :rules
@@ -72,7 +117,7 @@ module D2NA
     end
     
     # Add new Rule with special +conditions+ of input signals and non-zero
-    # states which is neccessary to start this code. Input signals name must
+    # states which is necessary to start this code. Input signals name must
     # start from upper case letter. Block will be eval on rule, so you can set
     # commands by +up+, +down+ and +send+ Rule methods.
     def on(*conditions, &block)

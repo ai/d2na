@@ -1,1 +1,65 @@
+= D²NA Language
 
+D²NA is a special language to generate code by genetic algorithm. It is
+something like a mixture of state engine and DNA.
+
+D²NA code has input and output signals to communicate with other world and
+states to store data. Input and output signals has name, which must start from
+upper case letter. State has name and integer value. When value is more than
+zero, state is active.
+
+There is build-in input signal <tt>:Init</tt>, which is something like
+constructor. On first usage it will be send to initialize fisrt states.
+
+D²NA code consists of rules. Each rule contains conditions (input signal and
+active states) and a set of commands, which will be run on all of this
+conditions. Command may be <tt>up :state</tt>, <tt>down :state</tt> or
+<tt>send :Output_signal</tt> to increment/decrement some state or to send some
+output signal.
+
+== Syntax
+
+Comment start by number sign <tt>#</tt> and end by end of line.
+
+State and signals names must start from <tt>:</tt> symbol (as a Symbol). Signal
+names must start from upper case latter. For example: <tt>:Input_signal</tt>,
+<tt>:state</tt>, <tt>:Output_signal</tt>.
+
+You can define input/output signals and states by <tt>input :Input_signal</tt>,
+<tt>state :state</tt>, <tt>output :Output_signal</tt> at the beginning of the
+file. It is optionally, because using signals and states will be detecting
+automatically by code.
+
+Rule is start from +on+ word. After it you should write input signal and states
+names separated by commas. When this input signal will be send to code and
+_all_ states will be active, this rule will be run.
+
+Command must be surrounded by +do+ and +end+ words. Each command must be on a
+separate line or separated by a semicolon.
+
+== Example
+
+  # Send alternately :Ping or :Pong
+  
+  input  :Print # Command to write next word
+  output :Ping, :Pong
+  state  :ping, :pong
+  
+  # Initialize first state
+  on :Init do
+    up :ping
+  end
+  
+  # Send ping and change state
+  on :Print, :ping do
+    send :Ping
+    down :ping
+    up :pong
+  end
+  
+  # Send pong and change state
+  on :Print, :pong do
+    send :Pong
+    down :pong
+    up :ping
+  end

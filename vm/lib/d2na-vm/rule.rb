@@ -21,9 +21,12 @@ module D2NA
   # Block of D²NA code. Contain commands (output signals and state changes), 
   # which will be executed on special condition (input signals and non-zero
   # states).
+  #
+  # It created in Code by +on+ method. You must use +up+, +down+ and +send+
+  # methods to add commands to increment/decrement states or send output signal.
   class Rule
     # Array of names (Symbol) of input signals and non-zero states which is
-    # neccessary to start this code. Input signals name must start from upper
+    # necessary to start this code. Input signals name must start from upper
     # case letter (for example, <tt>:Input</tt>).
     attr_reader :conditions
     
