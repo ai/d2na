@@ -121,8 +121,75 @@ describe D2NA::Code do
       end
     end
     
-    code.send_in :Input
+    code << :Input
     code.out.should == [:One]
+  end
+  
+  it "should run rule on input signals and states" do
+    code = RecorderCode.new do
+      on :Input do
+        send :Get
+        up :state
+      end
+      on :Input, :state do
+        send :State
+        down :state
+        down :state
+      end
+    end
+    
+    code << :Input
+    code.out.should == [:Get]
+    code.states[:state].should == 1
+    
+    code << :Input
+    code.out.should == [:Get, :State]
+    code.states[:state].should == 0
+  end
+  
+  it "should run rule by state" do
+    code = RecorderCode.new do
+      on :Save do
+        up :memory
+      end
+      on :Print do
+        up :print
+      end
+      on :print, :memory do
+        send :Output
+        down :memory
+      end
+    end
+    
+    code << :Save
+    code << :Save
+    code << :Save
+    code << :Print
+    code.out.should == [:Output, :Output, :Output]
+  end
+  
+  it "should start rules as layers" do
+    code = RecorderCode.new do
+      on :First do
+        up :start
+      end
+      on :Input do
+        up :state
+        down :start
+      end
+      on :Input, :start do
+        up :start
+        down :state
+      end
+      on :state do
+        send :Bad
+        down :state
+      end
+    end
+    
+    code << :First
+    code << :Input
+    code.out.should be_empty
   end
   
 end

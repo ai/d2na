@@ -42,6 +42,7 @@ module D2NA
       @input_signals = []
       @output_signals = []
       @states = {}
+      @diff = {}
       @conditions_cache = {}
       @listeners_all = []
       @listeners_signals = {}
@@ -84,8 +85,11 @@ module D2NA
         if name.to_s =~ /^[A-Z]/
           raise ArgumentError, 'State name must not be capitalized'
         end
-        @states[name] = 0 unless @states.has_key? name
-        @conditions_cache[name] = []
+        unless @states.has_key? name
+          @states[name] = 0
+          @diff[name] = 0
+          @conditions_cache[name] = []
+        end
       end
     end
     
@@ -108,18 +112,59 @@ module D2NA
     # Send input +signal+ into Code. Signals name must start from upper case
     # letter.
     def send_in(signal)
+      return unless @input_signals.include? signal
+      
       check_signal_name(signal)
       @conditions_cache[signal].each do |rule|
         rule.call if 1 == rule.required
       end
+      
+      rule_to_run = {}
+      while not @diff.empty? or not rule_to_run.empty?
+        @diff.each_pair do |state, diff|
+          @conditions_cache[state].each do |rule|
+            rule.required -= diff
+            rule_to_run[rule] = (0 == rule.required)
+          end
+        end
+        @diff = {}
+        rule_to_run.delete_if { |rule, run| not run }
+        rule_to_run.each_key do |rule|
+          rule.call
+        end
+      end
     end
-    alias << send
+    alias << send_in
     
     # Send output +signal+ from Code to listeners.
     def send_out(signal)
       @listeners_all.each { |i| i.call(self, signal) }
       if listeners = @listeners_signals[signal]
         listeners.each { |i| i.call(self, signal) }
+      end
+    end
+    
+    # Increment +state+ value.
+    def state_up(state)
+      @states[state] += 1
+      if 1 == @states[state]
+        if -1 == @diff[state]
+          @diff.delete state
+        else
+          @diff[state] = 1
+        end
+      end
+    end
+    
+    # Decrement +state+ value.
+    def state_down(state)
+      @states[state] -= 1
+      if 0 == @states[state]
+        if 1 == @diff[state]
+          @diff.delete state
+        else
+          @diff[state] = -1
+        end
       end
     end
     
