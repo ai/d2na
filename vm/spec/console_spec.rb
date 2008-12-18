@@ -49,4 +49,9 @@ describe D2NA::Console do
     @console.output.should == "\e[32m< \e[0m\e[31m> \e[0mOutput\n"
   end
   
+  it "should return message" do
+    @console.help.should match(/^Usage/)
+    @console.invalid_option('OPTION').should include('OPTION')
+  end
+  
 end

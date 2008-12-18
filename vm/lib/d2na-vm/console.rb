@@ -74,6 +74,35 @@ module D2NA
       @code << signal if signal
     end
     
+    # Return help message.
+    def help
+      <<-HELP
+Usage: d2na-vm [OPTION] FILE
+Run D2NA code. Use standart input/output to read and write signals.
+To close runtime press Ctrl+C.
+
+  -p, --prompt  display prompt
+  -c, --color   display color prompt
+  -h, --help    display this help message and exit
+
+Examples:
+  d2na-vm -c code.d2na  Start to work with human.
+  d2na-vm code.d2na     Start from another program to send/receive signals.
+
+Report bugs to <andrey@sitnik.ru>.
+      HELP
+    end
+    
+    # Return message on invalid option.
+    def invalid_option(option)
+      <<-OPTION
+d2na-vm: invalid option #{option}
+Try `d2na-vm --help` for more information.
+      OPTION
+    end
+    
+    protected
+    
     # Remove leading and trailing whitespaces, capitalize and convert to Symbol.
     def parse_signal(text)
       text.strip!

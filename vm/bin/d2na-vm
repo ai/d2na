@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+#
+# Console utility to run D²NA code.
+
+require File.join(File.dirname(__FILE__), '../lib/d2na-vm')
+console = D2NA::Console.new
+
+loaded = false
+ARGV.each do |arg|
+  if '-' == arg[0..0]
+    if '-c' == arg or '--color' == arg
+      console.color = true
+    elsif '-p' == arg or '--prompt' == arg
+      console.prompt = true
+    elsif '-h' == arg or '--help' == arg
+      puts console.help
+      exit
+    else
+      puts console.invalid_option(arg)
+      exit
+    end
+  else
+    console.load IO.read(arg)
+    loaded = true
+  end
+end
+
+unless loaded
+  puts console.help
+  exit
+end
+
+trap('INT') do
+  puts
+  exit
+end
+
+loop do
+  console.read
+end
