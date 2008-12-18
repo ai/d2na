@@ -204,9 +204,39 @@ describe D2NA::Code do
     end
     
     code.started?.should be_false
+    code.start
+    code.out.should == [:Started]
+    code.started?.should be_true
+    code.reset!
+    
     code << :Input
     code.out.should == [:Started, :Work]
     code.started?.should be_true
+  end
+  
+  it "should reset states and listeners" do
+    code = RecorderCode.new do
+      on :Init do
+        up :memory
+      end
+      on :Input do
+        up :memory
+      end
+    end
+    code << :Input
+    
+    mock = mock('listener', :dispatch => true)
+    code.listen &mock.method(:dispatch)
+    
+    code.reset!
+    
+    code.started?.should be_false
+    code.states[:memory].should == 0
+    
+    mock.should_not_receive(:dispatch)
+    code << :Input
+    code.started?.should be_true
+    code.states[:memory].should == 2
   end
   
 end

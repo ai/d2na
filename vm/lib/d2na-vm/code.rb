@@ -42,12 +42,9 @@ module D2NA
       @input_signals = []
       @output_signals = []
       @states = {}
-      @diff = {}
       @conditions_cache = {}
-      @listeners_all = []
-      @listeners_signals = {}
-      @started = false
       input :Init
+      reset!
       instance_eval(&block) if block_given?
     end
     
@@ -180,6 +177,15 @@ module D2NA
     def start
       @started = true
       send_in :Init
+    end
+    
+    # Reset all states and delete listeners.
+    def reset!
+      @listeners_all = []
+      @listeners_signals = {}
+      @started = false
+      @diff = {}
+      @states.each_key { |i| @states[i] = 0 }
     end
     
     protected

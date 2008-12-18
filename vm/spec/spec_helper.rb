@@ -1,12 +1,6 @@
 require File.join(File.dirname(__FILE__), '../lib/d2na-vm')
 
 class RecorderCode < D2NA::Code
-  def initialize(&block)
-    super(&block)
-    @__signals = []
-    listen &method(:__dispatch)
-  end
-  
   def __dispatch(code, signal)
     @__signals << signal
   end
@@ -15,5 +9,11 @@ class RecorderCode < D2NA::Code
     signals = @__signals
     @__signals = []
     signals
+  end
+  
+  def reset!
+    super
+    @__signals = []
+    listen &method(:__dispatch)
   end
 end
