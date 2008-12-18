@@ -24,12 +24,16 @@ module D2NA
     # Code object for this session.
     attr_reader :code
     
+    # Input stream to read signals (default is +STDIN+).
+    attr_accessor :input
+    
     # Output stream to print signals (default is +STDOUT+).
     attr_accessor :output
     
     # Create Code object.
     def initialize
       @code = Code.new
+      @input = STDIN
       @output = STDOUT
       @code.listen &method(:print)
     end
@@ -42,7 +46,22 @@ module D2NA
     
     # Print output signal to output stream.
     def print(code, signal)
-      @output.puts signal.to_s
+      @output << signal.to_s << "\n"
+    end
+    
+    # Read input signal from input stream.
+    def read
+      signal = parse_signal @input.readline
+      @code << signal if signal
+    end
+    
+    # Remove leading and trailing whitespaces, capitalize and convert to Symbol.
+    def parse_signal(text)
+      text.strip!
+      return if text.empty?
+      text = text[1..-1] if ':' == text[0..0]
+      text.capitalize!
+      text.to_sym
     end
   end
 end
