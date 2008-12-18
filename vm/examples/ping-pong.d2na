@@ -1,0 +1,22 @@
+input  :Print # Command to write next word
+output :Ping, :Pong
+state  :ping, :pong
+
+# Initialize first state
+on :Init do
+  up :ping
+end
+
+# Send ping and change state
+on :Print, :ping do
+  send :Ping
+  down :ping
+  up :pong
+end
+
+# Send pong and change state
+on :Print, :pong do
+  send :Pong
+  down :pong
+  up :ping
+end
