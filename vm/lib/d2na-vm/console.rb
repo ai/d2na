@@ -1,5 +1,5 @@
 =begin
-Main file to load all neccessary classes for D²NA.
+Run D²NA code in console.
 
 Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
@@ -17,12 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pathname'
-
 module D2NA
-  dir = Pathname(__FILE__).dirname.expand_path + 'd2na-vm'
-  require dir + 'rule'
-  require dir + 'code'
-  
-  autoload :Console, (dir + 'console').to_s
+  # Run D²NA code in console. Read input signals from STDIN and write to
+  # STDOUT.
+  class Console
+    # Code object for this session.
+    attr_reader :code
+    
+    # Create Code object.
+    def initialize
+      @code = Code.new
+    end
+    
+    # Parse +string+ and load rules for Code object.
+    def load(string)
+      rules = eval("proc { #{string} }")
+      @code.instance_eval &rules
+    end
+  end
 end
