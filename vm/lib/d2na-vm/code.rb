@@ -46,6 +46,8 @@ module D2NA
       @conditions_cache = {}
       @listeners_all = []
       @listeners_signals = {}
+      @started = false
+      input :Init
       instance_eval(&block) if block_given?
     end
     
@@ -112,6 +114,7 @@ module D2NA
     # Send input +signal+ into Code. Signals name must start from upper case
     # letter.
     def send_in(signal)
+      start unless @started
       return unless @input_signals.include? signal
       
       check_signal_name(signal)
@@ -166,6 +169,17 @@ module D2NA
           @diff[state] = -1
         end
       end
+    end
+    
+    # Is code run initialization rules (on :Init build-in signal).
+    def started?
+      @started
+    end
+    
+    # Send build-in :Init signal to initialize code.
+    def start
+      @started = true
+      send_in :Init
     end
     
     protected

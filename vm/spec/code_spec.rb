@@ -30,7 +30,7 @@ describe D2NA::Code do
       input :One, :Two
       input :One
     end
-    code.input_signals.should == [:One, :Two]
+    code.input_signals.should == [:Init, :One, :Two]
   end
   
   it "should raise error if input signal isn't capitalized" do
@@ -70,7 +70,7 @@ describe D2NA::Code do
       end
     end
     
-    code.input_signals.should == [:Input]
+    code.input_signals.should == [:Init, :Input]
     code.output_signals.should == [:Output]
     code.states.keys.should == [:state]
   end
@@ -85,6 +85,7 @@ describe D2NA::Code do
     end
     
     code.conditions_cache.should == {
+      :Init  => [],
       :Big   => [],
       :Small => [code.rules.first],
       :one   => [code.rules.first],
@@ -190,6 +191,22 @@ describe D2NA::Code do
     code << :First
     code << :Input
     code.out.should be_empty
+  end
+  
+  it "should has initialization signal" do
+    code = RecorderCode.new do
+      on :Init do
+        send :Started
+      end
+      on :Input do
+        send :Work
+      end
+    end
+    
+    code.started?.should be_false
+    code << :Input
+    code.out.should == [:Started, :Work]
+    code.started?.should be_true
   end
   
 end
