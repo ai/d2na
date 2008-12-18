@@ -17,6 +17,35 @@ conditions. Command may be <tt>up :state</tt>, <tt>down :state</tt> or
 <tt>send :Output_signal</tt> to increment/decrement some state or to send some
 output signal.
 
+== Usage
+
+You can define rules in Ruby code by D2NA::Code class:
+
+  code = D2NA::Code.new do
+    on :Input do
+      up :memory
+      send :Output
+    end
+  end
+  
+  code.listen do |code, signal|
+    puts "Receive #{signal}. Memory: #{code.states[:memory]}."
+  end
+  
+  code << :Input # Print "Receive Output. Memory 1."
+
+Or you can use <tt>d2na-vm</tt> script to print signals to standard output and
+read it from standard input:
+
+To use it by human and print and read signals by console (option <tt>-c</tt>
+will be make output more human readable):
+
+  d2na-vm -c script.d2na
+
+To use it from another program and write/read to standard input/output:
+
+  d2na-vm script.d2na
+
 == Syntax
 
 Comment start by number sign <tt>#</tt> and end by end of line.
