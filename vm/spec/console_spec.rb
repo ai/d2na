@@ -41,4 +41,12 @@ describe D2NA::Console do
     @console.output.should == "< > Output\n"
   end
   
+  it "should print color prompt" do
+    @console.color = true
+    @console.input << "Input\n"
+    @console.input.seek(0)
+    @console.read
+    @console.output.should == "\e[32m< \e[0m\e[31m> \e[0mOutput\n"
+  end
+  
 end

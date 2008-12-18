@@ -34,12 +34,16 @@ module D2NA
     # input signals.
     attr_accessor :prompt
     
+    # Print color prompt to console.
+    attr_accessor :color
+    
     # Create Code object.
     def initialize
       @code = Code.new
       @input = STDIN
       @output = STDOUT
       @prompt = false
+      @color = false
       @code.listen &method(:print)
     end
     
@@ -51,7 +55,9 @@ module D2NA
     
     # Print output signal to output stream.
     def print(code, signal)
-      if @prompt
+      if @color
+        @output << red('> ')
+      elsif @prompt
         @output << '> '
       end
       @output << signal.to_s << "\n"
@@ -59,7 +65,9 @@ module D2NA
     
     # Read input signal from input stream.
     def read
-      if @prompt
+      if @color
+        @output << green('< ')
+      elsif @prompt
         @output << '< '
       end
       signal = parse_signal @input.readline
@@ -73,6 +81,16 @@ module D2NA
       text = text[1..-1] if ':' == text[0..0]
       text.capitalize!
       text.to_sym
+    end
+    
+    # Add ANSI escape codes to print text as green.
+    def green(text)
+      "\e[32m" + text + "\e[0m"
+    end
+    
+    # Add ANSI escape codes to print text as red.
+    def red(text)
+      "\e[31m" + text + "\e[0m"
     end
   end
 end
