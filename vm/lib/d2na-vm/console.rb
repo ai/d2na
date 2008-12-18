@@ -24,15 +24,25 @@ module D2NA
     # Code object for this session.
     attr_reader :code
     
+    # Output stream to print signals (default is +STDOUT+).
+    attr_accessor :output
+    
     # Create Code object.
     def initialize
       @code = Code.new
+      @output = STDOUT
+      @code.listen &method(:print)
     end
     
     # Parse +string+ and load rules for Code object.
     def load(string)
       rules = eval("proc { #{string} }")
       @code.instance_eval &rules
+    end
+    
+    # Print output signal to output stream.
+    def print(code, signal)
+      @output.puts signal.to_s
     end
   end
 end
