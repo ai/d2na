@@ -33,4 +33,12 @@ describe D2NA::Console do
     @console.output.should == "Output\nOutput\nOutput\n"
   end
   
+  it "should print prompt" do
+    @console.prompt = true
+    @console.input << "Input\n"
+    @console.input.seek(0)
+    @console.read
+    @console.output.should == "< > Output\n"
+  end
+  
 end

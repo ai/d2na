@@ -30,11 +30,16 @@ module D2NA
     # Output stream to print signals (default is +STDOUT+).
     attr_accessor :output
     
+    # Write prompt to console: <tt>></tt> before output and <tt><</tt> before
+    # input signals.
+    attr_accessor :prompt
+    
     # Create Code object.
     def initialize
       @code = Code.new
       @input = STDIN
       @output = STDOUT
+      @prompt = false
       @code.listen &method(:print)
     end
     
@@ -46,11 +51,17 @@ module D2NA
     
     # Print output signal to output stream.
     def print(code, signal)
+      if @prompt
+        @output << '> '
+      end
       @output << signal.to_s << "\n"
     end
     
     # Read input signal from input stream.
     def read
+      if @prompt
+        @output << '< '
+      end
       signal = parse_signal @input.readline
       @code << signal if signal
     end
