@@ -1,0 +1,4 @@
+= D²NA
+
+D²NA is a project to find out, could we generate code by genetic algorithm as it
+did evolution for DNA.
