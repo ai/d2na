@@ -66,7 +66,7 @@ module D2NA
       compile
     end
     
-    # Run commands on owner
+    # Run commands on owner.
     def call
       @owner.instance_eval(&@compiled)
     end

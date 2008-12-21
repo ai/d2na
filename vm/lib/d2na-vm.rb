@@ -1,5 +1,5 @@
 =begin
-Main file to load all neccessary classes for D²NA.
+Main file to load all neccessary classes for D²NA virtual machine.
 
 Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 

@@ -35,7 +35,7 @@ You can define rules in Ruby code by D2NA::Code class:
   code << :Input # Print "Receive Output. Memory 1."
 
 Or you can use <tt>d2na-vm</tt> script to print signals to standard output and
-read it from standard input:
+read it from standard input.
 
 To use it by human and print and read signals by console (option <tt>-c</tt>
 will be make output more human readable):

@@ -62,9 +62,9 @@ module D2NA
   #     p signal
   #   end
   #   
-  #   code << :Input  # will print "ping"
-  #   code << :Input  # will print "pong"
-  #   code << :Input  # will print "ping"
+  #   code << :Input  # will print "Ping"
+  #   code << :Input  # will print "Pong"
+  #   code << :Input  # will print "Ping"
   class Code
     # Array of Rule with conditions and commands.
     attr_reader :rules
@@ -78,7 +78,7 @@ module D2NA
     # Hash of states with name (Symbol) as key and it value (Number) as value.
     attr_reader :states
     
-    # Hash with condition as key and dependency rule as value.
+    # Hash with condition as key and dependency rules as value.
     attr_reader :conditions_cache
     
     # Infinite recursion protection. How many levels of rule with only states in
@@ -98,7 +98,7 @@ module D2NA
       instance_eval(&block) if block_given?
     end
     
-    # Add new input +signals+. Input signals name must start from upper case
+    # Add new input +signals+. Input signal name must start from upper case
     # letter (for example, <tt>:Input</tt>).
     def input(*signals)
       signals.each do |signal|
@@ -117,7 +117,7 @@ module D2NA
     end
     
     # Add new Rule with special +conditions+ of input signals and non-zero
-    # states which is necessary to start this code. Input signals name must
+    # states which is necessary to start commands. Input signal name must
     # start from upper case letter. Block will be eval on rule, so you can set
     # commands by +up+, +down+ and +send+ Rule methods.
     def on(*conditions, &block)
@@ -142,8 +142,8 @@ module D2NA
       end
     end
     
-    # Set block to listen some +signals+ (names or nil for all). First argument
-    # of block will be this Code, second - signal name.
+    # Set block to listen some +signals+ (names or nothing for all). First
+    # argument of block will be this Code, second - signal name.
     def listen(*signals, &block)
       if signals.empty?
         @listeners_all << block
@@ -158,7 +158,7 @@ module D2NA
       end
     end
 
-    # Send input +signal+ into Code. Signals name must start from upper case
+    # Send input +signal+ into Code. Signal name must start from upper case
     # letter.
     def send_in(signal)
       start unless @started
@@ -219,7 +219,7 @@ module D2NA
       end
     end
     
-    # Is code run initialization rules (on :Init build-in signal).
+    # Is code run initialization rules (with :Init build-in signal).
     def started?
       @started
     end
