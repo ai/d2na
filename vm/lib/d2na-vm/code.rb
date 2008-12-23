@@ -85,6 +85,9 @@ module D2NA
     # condition will be run.
     attr_accessor :max_depth
     
+    # Command count in all rules in this code.
+    attr_reader :length
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @rules = []
@@ -96,6 +99,7 @@ module D2NA
       input :Init
       reset!
       instance_eval(&block) if block_given?
+      @length = @rules.inject(0) { |all, i| all + i.commands.length }
     end
     
     # Add new input +signals+. Input signal name must start from upper case

@@ -8,7 +8,6 @@ describe D2NA::Code do
         up :state
         send :Output
       end
-      
       on :Input, :state do
         down :state
       end
@@ -249,6 +248,20 @@ describe D2NA::Code do
       end
     end
     code.start
+  end
+  
+  it "should return command count" do
+    code = D2NA::Code.new do
+      on :Input do
+        up :state
+        send :Output
+      end
+      on :Input, :state do
+        down :state
+      end
+    end
+    
+    code.length.should == 3
   end
   
 end
