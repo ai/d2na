@@ -98,7 +98,10 @@ module D2NA
       @compiled = eval(
         @commands.inject('proc {') do |code, command|
           type, name = command
-          next if Symbol != name.class
+          if Symbol != name.class or name.to_s =~ /[\W]/
+            raise SecurityError, 'Signal and state name must be Symbol and ' +
+                                 'contain only letters, digits underscore'
+          end
           code + methods[type] + " :#{name}\n"
         end +
       '}')

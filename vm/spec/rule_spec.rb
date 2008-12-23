@@ -11,9 +11,9 @@ describe D2NA::Rule do
     rule = D2NA::Rule.new [:Input, :state], nil do
       up :state
       down :state
-      send :Output
+      send :"Output1"
     end
-    rule.commands.should == [[:up, :state], [:down, :state], [:send, :Output]]
+    rule.commands.should == [[:up, :state], [:down, :state], [:send, :Output1]]
   end
   
   it "should run commands on owner" do
@@ -29,6 +29,18 @@ describe D2NA::Rule do
       down :state
     end
     rule.call
+  end
+  
+  it "shouldn't has code injection" do
+    rule = D2NA::Rule.new [:Input, :state], nil do
+      @commands << [:send, :Signal_Name_0]
+    end
+      
+    lambda {
+      rule = D2NA::Rule.new [:Input, :state], nil do
+        @commands << [:'raise Error', :'raise Error;raise']
+      end
+    }.should raise_error SecurityError
   end
   
 end
