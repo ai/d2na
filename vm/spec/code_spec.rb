@@ -161,9 +161,7 @@ describe D2NA::Code do
       end
     end
     
-    code << :Save
-    code << :Save
-    code << :Save
+    code << :Save << :Save << :Save
     code << :Print
     code.out.should == [:Output, :Output, :Output]
   end

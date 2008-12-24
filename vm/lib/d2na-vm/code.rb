@@ -166,7 +166,7 @@ module D2NA
     # letter.
     def send_in(signal)
       start unless @started
-      return unless @input_signals.include? signal
+      return self unless @input_signals.include? signal
       
       check_signal_name(signal)
       @conditions_cache[signal].each do |rule|
@@ -188,6 +188,7 @@ module D2NA
           rule.call
         end
       end
+      self
     end
     alias << send_in
     

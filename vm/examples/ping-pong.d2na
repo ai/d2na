@@ -1,3 +1,5 @@
+# Send alternately :Ping or :Pong.
+
 input  :Print # Command to write next word
 output :Ping, :Pong
 state  :ping, :pong
