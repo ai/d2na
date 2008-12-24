@@ -28,3 +28,4 @@ rescue LoadError
 end
 
 require dir + 'd2na-evolution/rubiner'
+require dir + 'd2na-evolution/modifier'

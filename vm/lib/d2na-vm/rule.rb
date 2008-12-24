@@ -71,6 +71,22 @@ module D2NA
       @owner.instance_eval(&@compiled)
     end
     
+    # Compile commands to Proc.
+    def compile
+      methods = Hash.new('').merge!(
+        { :send => 'send_out', :up => 'state_up', :down => 'state_down' })
+      @compiled = eval(
+        @commands.inject('proc {') do |code, command|
+          type, name = command
+          if Symbol != name.class or name.to_s =~ /[\W]/
+            raise SecurityError, 'Signal and state name must be Symbol and ' +
+                                 'contain only letters, digits underscore'
+          end
+          code + methods[type] + " :#{name}\n"
+        end +
+      '}')
+    end
+    
     protected
     
     # Add command to increment +state+.
@@ -89,22 +105,6 @@ module D2NA
     def send(signal)
       @output << signal
       @commands << [:send, signal]
-    end
-    
-    # Compile commands to Proc.
-    def compile
-      methods = Hash.new('').merge!(
-        { :send => 'send_out', :up => 'state_up', :down => 'state_down' })
-      @compiled = eval(
-        @commands.inject('proc {') do |code, command|
-          type, name = command
-          if Symbol != name.class or name.to_s =~ /[\W]/
-            raise SecurityError, 'Signal and state name must be Symbol and ' +
-                                 'contain only letters, digits underscore'
-          end
-          code + methods[type] + " :#{name}\n"
-        end +
-      '}')
     end
   end
 end
