@@ -17,9 +17,62 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'set'
+
 module D2NA
   # Extend D²NA Code to evolution: modify, mutate and print as Ruby core.
   class MutableCode < Code
+    # Conditions without rules.
+    attr_reader :unused_conditions
+    
+    # Create D²NA code. Block will be eval on new instance.
+    def initialize(&block)
+      @exists_conditions = Set[]
+      @unused_conditions = []
+      @conditions_permutations = [Set[]]
+      super(&block)
+    end
+    
+    # Add new input +signals+. Input signal name must start from upper case
+    # letter (for example, <tt>:Input</tt>).
+    def input(*signals)
+      super(*signals).each do |signal|
+        if :Init == signal
+          add_unused_conditions(Set[:Init])
+        else
+          @conditions_permutations.each do |states|
+            add_unused_conditions(states + [signal])
+          end
+        end
+      end
+    end
+    
+    # Define +states+. State name must start from lower case latter
+    # (for example, <tt>:state</tt>).
+    def add_states(*states)
+      super(*states).each do |state|
+        @conditions_permutations += @conditions_permutations.map do |i|
+          conditions = i + [state]
+          add_unused_conditions(conditions)
+          (@input_signals - [:Init]).each do |signal|
+            add_unused_conditions(conditions + [signal])
+          end
+          conditions
+        end
+      end
+    end
+    
+    # Add new Rule with special +conditions+ of input signals and non-zero
+    # states which is necessary to start commands. Input signal name must
+    # start from upper case letter. Block will be eval on rule, so you can set
+    # commands by +up+, +down+ and +send+ Rule methods.
+    def on(*conditions, &block)
+      set = conditions.to_set
+      @exists_conditions << set
+      @unused_conditions.delete(set)
+      super(*conditions, &block)
+    end
+    
     # Use +add_command+ and +remove_command+ in block of this method to modify
     # code. Block will be eval on Code instance. For example:
     #
@@ -72,7 +125,25 @@ module D2NA
       end
     end
     
+    # Delete rule from code and caches.
+    def delete_rule(rule)
+      set = rule.conditions
+      @unused_conditions << set
+      @exists_conditions.delete(set)
+      @rules.delete(rule)
+      rule.conditions.each do |condition|
+        @conditions_cache[condition].delete(rule)
+      end
+    end
+    
     protected
+    
+    # Add conditions as unused if it isn’t used in rules.
+    def add_unused_conditions(conditions)
+      unless @exists_conditions.include? conditions
+        @unused_conditions << conditions
+      end
+    end
     
     # Insert +command+ (<tt>:send</tt>, <tt>:up</tt> or <tt>:down</tt>) in this
     # +rule+ with +param+ (signal name to +send+ command or state name of
@@ -94,7 +165,11 @@ module D2NA
       @rules.each do |rule|
         if before + rule.commands.length > position
           rule.commands.delete_at(position - before)
-          @modified_rules << rule
+          if rule.commands.empty?
+            delete_rule(rule)
+          else
+            @modified_rules << rule
+          end
           break
         else
           before += rule.commands.length
