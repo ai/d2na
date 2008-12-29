@@ -1,5 +1,5 @@
 =begin
-Change rules in D²NA code.
+Extend D²NA Code to evolution: modify, mutate and print as Ruby core.
 
 Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
@@ -18,41 +18,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 module D2NA
-  # Add/remove commands to mutation.
-  # For example:
-  #
-  #   code = D2NA::Code.new do
-  #     on :Init do
-  #       up :waiting
-  #     end
-  #     on :Input do
-  #       send :Output
-  #       down :waiting
-  #     end
-  #   end
-  #   
-  #   code.modify do
-  #     add_command(0, :send, :Started)
-  #     remove_command(3)
-  #   end
-  #
-  # Result:
-  # 
-  #   on :Init do
-  #     up :waiting
-  #     send :Started
-  #   end
-  #   on :Input do
-  #     send :Output
-  #   end
-  module CodeModifierMixin
+  # Extend D²NA Code to evolution: modify, mutate and print as Ruby core.
+  class MutableCode < Code
     # Use +add_command+ and +remove_command+ in block of this method to modify
-    # code. Block will be eval on Code instance.
+    # code. Block will be eval on Code instance. For example:
+    #
+    #   code = D2NA::Code.new do
+    #     on :Init do
+    #       up :waiting
+    #     end
+    #     on :Input do
+    #       send :Output
+    #       down :waiting
+    #     end
+    #   end
+    #   
+    #   code.modify do
+    #     add_command(0, :send, :Started)
+    #     remove_command(3)
+    #   end
+    #
+    # Result:
+    # 
+    #   on :Init do
+    #     up :waiting
+    #     send :Started
+    #   end
+    #   on :Input do
+    #     send :Output
+    #   end
     def modify(&block)
       @modified_rules = []
       self.instance_eval(&block)
       @modified_rules.uniq.each do |rule|
         rule.compile
+      end
+      self
+    end
+    
+    # Return Ruby representation of Code to save as file.
+    def to_ruby
+      'input  :' + (@input_signals - [:Init]).join(', :') + "\n" +
+      'output :' + @output_signals.join(', :') + 
+      @rules.inject('') do |all, rule|
+        if 0 == rule.commands.length
+          all
+        else
+          all + "\n\n" +
+          'on :' + rule.conditions.join(', :') + " do\n" +
+            rule.commands.inject('') { |all, i| all + "  #{i[0]} :#{i[1]}\n" } +
+          'end'
+        end
       end
     end
     
@@ -86,9 +102,5 @@ module D2NA
       end
       @length -= 1
     end
-  end
-  
-  class Code
-    include CodeModifierMixin
   end
 end

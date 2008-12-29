@@ -27,5 +27,4 @@ rescue LoadError
   exit
 end
 
-require dir + 'd2na-evolution/rubiner'
-require dir + 'd2na-evolution/modifier'
+require dir + 'd2na-evolution/mutable_code'
