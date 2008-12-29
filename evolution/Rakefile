@@ -8,14 +8,6 @@ Spec::Rake::SpecTask.new('spec') do |t|
   t.spec_files = Dir['spec/**/*_spec.rb'].sort
 end
 
-Spec::Rake::SpecTask.new('rcov') do |t|
-  t.spec_opts = ['--colour']
-  t.spec_files = Dir['spec/**/*_spec.rb'].sort
-  t.libs = ['lib']
-  t.rcov = true
-  t.rcov_opts = ['--text-summary --exclude vm,lib/d2na-evolution.rb']
-end
-
 Rake::RDocTask.new do |rdoc|
   rdoc.main = 'README.rdoc'
   rdoc.rdoc_files.include('README.rdoc', 'LICENSE', 'lib/**/*.rb')
