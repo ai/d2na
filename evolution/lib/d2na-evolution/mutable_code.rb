@@ -101,9 +101,9 @@ module D2NA
     #     send :Output
     #   end
     def modify(&block)
-      @modified_rules = []
+      @modified_rules = Set[]
       self.instance_eval(&block)
-      @modified_rules.uniq.each do |rule|
+      @modified_rules.each do |rule|
         rule.compile
       end
       self
@@ -136,6 +136,11 @@ module D2NA
       end
     end
     
+    # Count of all conditions wich can be with this states and input signals.
+    def conditions_count
+      @rules.length + unused_conditions.length
+    end
+    
     protected
     
     # Add conditions as unused if it isn’t used in rules.
@@ -145,15 +150,23 @@ module D2NA
       end
     end
     
-    # Insert +command+ (<tt>:send</tt>, <tt>:up</tt> or <tt>:down</tt>) in this
-    # +rule+ with +param+ (signal name to +send+ command or state name of
-    # +up+/+down+ command).
+    # Insert +command+ (<tt>:send</tt>, <tt>:up</tt> or <tt>:down</tt>) with
+    # +param+ (signal name to +send+ command or state name of +up+/+down+
+    # command) in rule with special number.
+    #
+    # You can use number more that rules exists – rule will be created from
+    # +unused_conditions+. Rule number must be less, that +conditions_count+.
     #
     # Call this method in +modify+ block.
     def add_command(rule, command, param)
       output param if :send == command
-      @rules[rule].commands << [command, param]
-      @modified_rules << @rules[rule]
+      if @rules.length > rule
+        modified_rule = @rules[rule]
+      else
+        modified_rule = on(*@unused_conditions[rule - @rules.length].to_a)
+      end
+      modified_rule.commands << [command, param]
+      @modified_rules << modified_rule
       @length += 1
     end
     
@@ -167,6 +180,7 @@ module D2NA
           rule.commands.delete_at(position - before)
           if rule.commands.empty?
             delete_rule(rule)
+            @modified_rules.delete(rule)
           else
             @modified_rules << rule
           end

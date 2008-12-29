@@ -50,20 +50,23 @@ module D2NA
       @commands = []
       @output = []
       @states = []
-      instance_eval(&block) if block_given?
       
-      if @owner
-        @owner.input *(@conditions.reject do |condition|
-          unless condition.to_s =~ /^[A-Z]/
-            @states << condition
-          end
-        end)
-        @owner.output(*@output)
-        @owner.add_states(*@states)
+      if block_given?
+        instance_eval(&block)
+        
+        if @owner
+          @owner.input *(@conditions.reject do |condition|
+            unless condition.to_s =~ /^[A-Z]/
+              @states << condition
+            end
+          end)
+          @owner.output(*@output)
+          @owner.add_states(*@states)
+        end
+        @output = @states = nil
+        
+        compile
       end
-      @output = @states = nil
-      
-      compile
     end
     
     # Run commands on owner.

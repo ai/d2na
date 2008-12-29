@@ -15,8 +15,8 @@ describe D2NA::MutableCode do
   
   it "should add and remove commands" do
     @code.modify do
-      add_command(0, :send, :Started)
-      remove_command(3)
+      add_command 0, :send, :Started
+      remove_command 3
     end
     
     @code.rules[0].commands.should == [[:up, :waiting], [:send, :Started]]
@@ -49,23 +49,36 @@ describe D2NA::MutableCode do
     end
   end
   
-  it "should delete empty rule" do
-    @code.modify do
-      remove_command(0)
-    end
-    @code.rules.length.should == 1
-  end
-  
   it "should has unused conditions" do
     code = D2NA::MutableCode.new do
       on :Input, :two do
         down :one
       end
     end
+    
+    code.conditions_count.should == 8
     code.unused_conditions.should == [Set[:Init], Set[:Input],
                                       Set[:one], Set[:one, :Input],
                                       Set[:two],
                                       Set[:one, :two], Set[:one, :two, :Input]]
+  end
+  
+  it "should create rule from unused conditions" do
+    @code.modify do
+      add_command 4, :send, :Output
+    end
+    
+    @code.rules.length.should == 3
+    @code.rules[2].conditions.should == [:waiting, :Input]
+    @code.rules[2].commands.should == [[:send, :Output]]
+    @code.conditions_cache[:waiting].should == [@code.rules[2]]
+  end
+  
+  it "should delete empty rule" do
+    @code.modify do
+      remove_command(0)
+    end
+    @code.rules.length.should == 1
   end
   
   it "should convert Code to Ruby" do
