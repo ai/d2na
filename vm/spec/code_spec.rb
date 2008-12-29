@@ -45,14 +45,14 @@ describe D2NA::Code do
   
   it "should add new state" do
     code = D2NA::Code.new
-    code.state(:one, :one, :two).should == [:one, :two]
+    code.add_states(:one, :one, :two).should == [:one, :two]
     code.states.length.should == 2
   end
   
   it "should raise error if state if capitalized" do
     code = D2NA::Code.new
     lambda {
-      code.state :Bad
+      code.add_states :Bad
     }.should raise_error ArgumentError, /must not be capitalized/
   end
   
@@ -73,7 +73,7 @@ describe D2NA::Code do
   it "should create conditions cache" do
     code = D2NA::Code.new do
       input :Big
-      state :one
+      add_states :one
       on :Small, :one, :two do
         up :three
       end

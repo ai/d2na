@@ -59,7 +59,7 @@ module D2NA
           end
         end)
         @owner.output(*@output)
-        @owner.state(*@states)
+        @owner.add_states(*@states)
       end
       @output = @states = nil
       

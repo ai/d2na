@@ -142,7 +142,7 @@ module D2NA
     
     # Define +states+. State name must start from lower case latter
     # (for example, <tt>:state</tt>). Return new states.
-    def state(*states)
+    def add_states(*states)
       states.reject do |name|
         if name.to_s =~ /^[A-Z]/
           raise ArgumentError, 'State name must not be capitalized'
