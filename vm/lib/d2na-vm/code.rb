@@ -103,20 +103,29 @@ module D2NA
     end
     
     # Add new input +signals+. Input signal name must start from upper case
-    # letter (for example, <tt>:Input</tt>).
+    # letter (for example, <tt>:Input</tt>). Return new signals.
     def input(*signals)
-      signals.each do |signal|
-        next if @input_signals.include? signal
-        check_signal_name(signal)
-        @input_signals << signal
-        @conditions_cache[signal] = []
+      signals.reject do |signal|
+        if @input_signals.include? signal
+          true
+        else
+          check_signal_name(signal)
+          @input_signals << signal
+          @conditions_cache[signal] = []
+          false
+        end
       end
     end
     
-    # Add new output +signals+.
+    # Add new output +signals+. Return new signals.
     def output(*signals)
-      signals.each do |signal|
-        @output_signals << signal unless @output_signals.include? signal
+      signals.reject do |signal|
+        if @output_signals.include? signal
+          true
+        else
+          @output_signals << signal
+          false
+        end
       end
     end
     
@@ -132,16 +141,19 @@ module D2NA
     end
     
     # Define +states+. State name must start from lower case latter
-    # (for example, <tt>:state</tt>).
+    # (for example, <tt>:state</tt>). Return new states.
     def state(*states)
-      states.each do |name|
+      states.reject do |name|
         if name.to_s =~ /^[A-Z]/
           raise ArgumentError, 'State name must not be capitalized'
         end
-        unless @states.has_key? name
+        if @states.has_key? name
+          true
+        else
           @states[name] = 0
           @diff[name] = 0
           @conditions_cache[name] = []
+          false
         end
       end
     end

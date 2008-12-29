@@ -25,10 +25,8 @@ describe D2NA::Code do
   end
   
   it "should add new input signal" do
-    code = D2NA::Code.new do
-      input :One, :Two
-      input :One
-    end
+    code = D2NA::Code.new
+    code.input(:One, :Two, :One).should == [:One, :Two]
     code.input_signals.should == [:Init, :One, :Two]
   end
   
@@ -40,17 +38,15 @@ describe D2NA::Code do
   end
   
   it "should add new output signal" do
-    code = D2NA::Code.new do
-      output :One, :One, :Two
-    end
+    code = D2NA::Code.new
+    code.output(:One, :One, :Two).should == [:One, :Two]
     code.output_signals.should == [:One, :Two]
   end
   
   it "should add new state" do
-    code = D2NA::Code.new do
-      state :state
-    end
-    code.states.keys.should == [:state]
+    code = D2NA::Code.new
+    code.state(:one, :one, :two).should == [:one, :two]
+    code.states.length.should == 2
   end
   
   it "should raise error if state if capitalized" do
