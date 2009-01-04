@@ -35,18 +35,14 @@ module D2NA
     # (send output signal). Name should be state or output signal name.
     attr_reader :commands
     
-    # Code, which store state value and receive and send signals for this rule.
-    attr_accessor :owner
-    
     # How many conditions aren’t satisfied.
     attr_accessor :required
     
-    # Create D²NA rule for +owner+ Code with special +conditions+. In block you
-    # can call +up+, +down+ and +send+ methods to add commands.
-    def initialize(conditions, owner, &block)
+    # Create D²NA rule for +creator+ Code with special +conditions+. In block
+    # you can call +up+, +down+ and +send+ methods to add commands.
+    def initialize(conditions, creator = nil, &block)
       @conditions = conditions
       @required = conditions.length
-      @owner = owner
       @commands = []
       @output = []
       @states = []
@@ -54,14 +50,14 @@ module D2NA
       if block_given?
         instance_eval(&block)
         
-        if @owner
-          @owner.input *(@conditions.reject do |condition|
+        if creator
+          creator.input *(@conditions.reject do |condition|
             unless condition.to_s =~ /^[A-Z]/
               @states << condition
             end
           end)
-          @owner.output(*@output)
-          @owner.add_states(*@states)
+          creator.output(*@output)
+          creator.add_states(*@states)
         end
         @output = @states = nil
         
@@ -69,9 +65,9 @@ module D2NA
       end
     end
     
-    # Run commands on owner.
-    def call
-      @owner.instance_eval(&@compiled)
+    # Run commands on +owner+.
+    def call(owner)
+      owner.instance_eval(&@compiled)
     end
     
     # Compile commands to Proc.

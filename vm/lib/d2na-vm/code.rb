@@ -182,7 +182,7 @@ module D2NA
       
       check_signal_name(signal)
       @conditions_cache[signal].each do |rule|
-        rule.call if 1 == rule.required
+        rule.call(self) if 1 == rule.required
       end
       
       rule_to_run = {}
@@ -197,7 +197,7 @@ module D2NA
         @diff = {}
         rule_to_run.delete_if { |rule, run| not run }
         rule_to_run.each_key do |rule|
-          rule.call
+          rule.call(self)
         end
       end
       self
