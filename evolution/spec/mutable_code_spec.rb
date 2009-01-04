@@ -75,10 +75,12 @@ describe D2NA::MutableCode do
   end
   
   it "should delete empty rule" do
+    unused = @code.unused_conditions.length
     @code.modify do
       remove_command(0)
     end
     @code.rules.length.should == 1
+    @code.unused_conditions.length.should == unused + 1
   end
   
   it "should convert Code to Ruby" do

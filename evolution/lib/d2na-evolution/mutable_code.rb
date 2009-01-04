@@ -152,21 +152,21 @@ module D2NA
     
     # Insert +command+ (<tt>:send</tt>, <tt>:up</tt> or <tt>:down</tt>) with
     # +param+ (signal name to +send+ command or state name of +up+/+down+
-    # command) in rule with special number.
+    # command) in rule with special +rule_number+.
     #
     # You can use number more that rules exists – rule will be created from
     # +unused_conditions+. Rule number must be less, that +conditions_count+.
     #
     # Call this method in +modify+ block.
-    def add_command(rule, command, param)
+    def add_command(rule_number, command, param)
       output param if :send == command
-      if @rules.length > rule
-        modified_rule = @rules[rule]
+      if @rules.length > rule_number
+        rule = @rules[rule_number]
       else
-        modified_rule = on(*@unused_conditions[rule - @rules.length].to_a)
+        rule = on(*@unused_conditions[rule_number - @rules.length].to_a)
       end
-      modified_rule.commands << [command, param]
-      @modified_rules << modified_rule
+      rule.commands << [command, param]
+      @modified_rules << rule
       @length += 1
     end
     
