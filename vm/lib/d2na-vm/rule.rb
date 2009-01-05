@@ -46,23 +46,22 @@ module D2NA
       @commands = []
       @output = []
       @states = []
-      
+        
       if block_given?
         instance_eval(&block)
-        
-        if creator
-          creator.input *(@conditions.reject do |condition|
-            unless condition.to_s =~ /^[A-Z]/
-              @states << condition
-            end
-          end)
-          creator.output(*@output)
-          creator.add_states(*@states)
-        end
-        @output = @states = nil
-        
         compile
       end
+      
+      if creator
+        creator.input *(@conditions.reject do |condition|
+          unless condition.to_s =~ /^[A-Z]/
+            @states << condition
+          end
+        end)
+        creator.output(*@output)
+        creator.add_states(*@states)
+      end
+      @output = @states = nil
     end
     
     # Run commands on +owner+.

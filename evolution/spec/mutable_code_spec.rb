@@ -40,13 +40,17 @@ describe D2NA::MutableCode do
   end
   
   it "should compile modified rules" do
-    @code.rules[0].should_receive(:compile).once
-    @code.rules[1].should_not_receive(:compile)
+    one = @code.rules[0].instance_variable_get(:@compiled)
+    two = @code.rules[1].instance_variable_get(:@compiled)
+    
     @code.modify do
       add_command 0, :send, :Started
       add_command 0, :down, :waiting
       remove_command 2
     end
+    
+    @code.rules[0].instance_variable_get(:@compiled).should_not == one
+    @code.rules[1].instance_variable_get(:@compiled).should == two
   end
   
   it "should has unused conditions" do
@@ -112,5 +116,29 @@ describe D2NA::MutableCode do
                            "on :Input do\n" +
                            "  send :Output\n" +
                            "end"
+  end
+  
+  it "should clone rule on write" do
+    another = @code.clone
+    
+    another.object_id.should_not == @code.object_id
+    another.rules.object_id.should_not == @code.rules.object_id
+    another.rules[0].object_id.should == @code.rules[0].object_id
+    another.rules[1].object_id.should == @code.rules[1].object_id
+    
+    another.on :Two
+    @code.rules.length.should == 2
+    @code.input_signals.length.should == 3
+    
+    another.modify do
+      add_command 0, :down, :waiting
+    end
+    another.rules[0].object_id.should_not == @code.rules[0].object_id
+    another.rules[1].object_id.should == @code.rules[1].object_id
+    
+    another.modify do
+      remove_command 2
+    end
+    another.rules[1].object_id.should_not == @code.rules[1].object_id
   end
 end

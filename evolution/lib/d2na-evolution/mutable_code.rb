@@ -141,6 +141,19 @@ module D2NA
       @rules.length + unused_conditions.length
     end
     
+    # Clone object with all instance variables without rules.
+    def clone
+      another = super
+      (instance_variables - ['@rules']).each do |name|
+        value = instance_variable_get(name)
+        if Hash == value.class or Array == value.class
+          another.instance_variable_set(name, value.dup)
+        end
+      end
+      another.instance_variable_set('@rules', @rules.clone)
+      another
+    end
+    
     protected
     
     # Add conditions as unused if it isn’t used in rules.
@@ -161,7 +174,8 @@ module D2NA
     def add_command(rule_number, command, param)
       output param if :send == command
       if @rules.length > rule_number
-        rule = @rules[rule_number]
+        rule = @rules[rule_number].dup
+        @rules[rule_number] = rule
       else
         rule = on(*@unused_conditions[rule_number - @rules.length].to_a)
       end
@@ -175,16 +189,18 @@ module D2NA
     # Call this method in +modify+ block.
     def remove_command(position)
       before = 0
-      @rules.each do |rule|
+      @rules.each_with_index do |rule, i|
         if before + rule.commands.length > position
-          rule.commands.delete_at(position - before)
-          if rule.commands.empty?
+          if 1 == rule.commands.length
             delete_rule(rule)
             @modified_rules.delete(rule)
           else
+            rule = rule.dup
+            @rules[i] = rule
+            rule.commands.delete_at(position - before)
             @modified_rules << rule
+            break
           end
-          break
         else
           before += rule.commands.length
         end
