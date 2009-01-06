@@ -129,6 +129,7 @@ describe D2NA::MutableCode do
     another.on :Two
     @code.rules.length.should == 2
     @code.input_signals.length.should == 3
+    @code.instance_variable_get(:@exists_conditions).length.should == 2
     
     another.modify do
       add_command 0, :down, :waiting

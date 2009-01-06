@@ -146,7 +146,7 @@ module D2NA
       another = super
       (instance_variables - ['@rules']).each do |name|
         value = instance_variable_get(name)
-        if Hash == value.class or Array == value.class
+        if value.kind_of? Enumerable
           another.instance_variable_set(name, value.dup)
         end
       end
