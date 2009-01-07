@@ -121,10 +121,10 @@ describe D2NA::MutableCode do
   it "should clone rule on write" do
     another = @code.clone
     
-    another.object_id.should_not == @code.object_id
-    another.rules.object_id.should_not == @code.rules.object_id
-    another.rules[0].object_id.should == @code.rules[0].object_id
-    another.rules[1].object_id.should == @code.rules[1].object_id
+    another.should_not equal(@code)
+    another.rules.should_not equal(@code.rules)
+    another.rules[0].should equal(@code.rules[0])
+    another.rules[1].should equal(@code.rules[1])
     
     another.on :Two
     @code.rules.length.should == 2
@@ -134,19 +134,40 @@ describe D2NA::MutableCode do
     another.modify do
       add_command 0, :down, :waiting
     end
-    another.rules[0].object_id.should_not == @code.rules[0].object_id
-    another.rules[1].object_id.should == @code.rules[1].object_id
+    another.rules[0].should_not equal(@code.rules[0])
+    another.rules[1].should equal(@code.rules[1])
     
     another.modify do
       remove_command 2
     end
-    another.rules[1].object_id.should_not == @code.rules[1].object_id
+    another.rules[1].should_not equal(@code.rules[1])
   end
   
   it "should delete rule" do
+    unused = @code.unused_conditions.length
     @code.delete_rule(@code.rules[1])
     @code.rules.length.should == 1
     @code.length.should == 1
     @code.conditions_cache[:Input].should be_empty
+    @code.unused_conditions.length.should == unused + 1
+  end
+  
+  it "should remove state" do
+    code = D2NA::MutableCode.new do
+      on :Init do
+        send :Output
+        up :waiting
+      end
+      on :Input, :waiting do
+        send :Output
+      end
+    end
+    code.remove_state :waiting
+    
+    code.states.keys.should_not include(:waiting)
+    code.unused_conditions.length.should == 1
+    code.conditions_cache.keys.should_not include(:waiting)
+    code.rules.length.should == 1
+    code.rules[0].commands.should == [[:send, :Output]]
   end
 end

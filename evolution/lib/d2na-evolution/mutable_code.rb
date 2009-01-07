@@ -127,7 +127,7 @@ module D2NA
     
     # Delete rule from code and caches.
     def delete_rule(rule)
-      set = rule.conditions
+      set = rule.conditions.to_set
       @unused_conditions << set
       @exists_conditions.delete(set)
       @rules.delete(rule)
@@ -135,6 +135,27 @@ module D2NA
         @conditions_cache[condition].delete(rule)
       end
       @length -= rule.commands.length
+    end
+    
+    # Delete state, all it’s commands and rules with it in conditions.
+    def remove_state(state)
+      @conditions_cache[state].each do |rule|
+        delete_rule(rule)
+      end
+      @conditions_cache.delete(state)
+      @conditions_permutations.delete_if { |i| i.include? state }
+      @unused_conditions.delete_if { |i| i.include? state }
+      @states.delete(state)
+      modify do
+        @rules.each_with_index do |rule, rule_number|
+          rule.commands.each_with_index do |command, command_number|
+            if state == command[1]
+              remove_command(command_number, rule_number)
+              break
+            end
+          end
+        end
+      end
     end
     
     # Count of all conditions wich can be with this states and input signals.
@@ -185,28 +206,33 @@ module D2NA
       @length += 1
     end
     
-    # Delete command in special +position+ of all code (start from zero).
+    # Delete command in special +position+ of all code if +rule+ is +nil+ or
+    # in +position+ in rule with special number.
     #
     # Call this method in +modify+ block.
-    def remove_command(position)
-      before = 0
-      @rules.each_with_index do |rule, i|
-        if before + rule.commands.length > position
-          if 1 == rule.commands.length
-            delete_rule(rule)
-            @modified_rules.delete(rule)
-          else
-            rule = rule.dup
-            @rules[i] = rule
-            rule.commands.delete_at(position - before)
-            @modified_rules << rule
-            break
-          end
+    def remove_command(position, rule_number = nil)
+      if rule_number
+        rule = @rules[rule_number]
+        if 1 == rule.commands.length
+          delete_rule(rule)
+          @modified_rules.delete(rule)
         else
+          rule = rule.dup
+          @rules[rule_number] = rule
+          rule.commands.delete_at(position)
+          @modified_rules << rule
+        end
+        @length -= 1
+        rule
+      else
+        before = 0
+        @rules.each_with_index do |rule, i|
+          if before + rule.commands.length > position
+            return remove_command(position - before, i)
+          end
           before += rule.commands.length
         end
       end
-      @length -= 1
     end
   end
 end
