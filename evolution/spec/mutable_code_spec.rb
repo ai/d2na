@@ -122,6 +122,8 @@ describe D2NA::MutableCode do
     another = @code.clone
     
     another.should_not equal(@code)
+    another.parent.should equal(@code)
+    
     another.rules.should_not equal(@code.rules)
     another.rules[0].should equal(@code.rules[0])
     another.rules[1].should equal(@code.rules[1])

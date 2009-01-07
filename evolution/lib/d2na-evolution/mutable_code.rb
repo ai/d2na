@@ -25,6 +25,9 @@ module D2NA
     # Conditions without rules.
     attr_reader :unused_conditions
     
+    # Code, which be cloned to this one.
+    attr_reader :parent
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @exists_conditions = Set[]
@@ -173,6 +176,7 @@ module D2NA
         end
       end
       another.instance_variable_set('@rules', @rules.clone)
+      another.instance_variable_set('@parent', self)
       another
     end
     
