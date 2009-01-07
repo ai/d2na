@@ -134,6 +134,7 @@ module D2NA
       rule.conditions.each do |condition|
         @conditions_cache[condition].delete(rule)
       end
+      @length -= rule.commands.length
     end
     
     # Count of all conditions wich can be with this states and input signals.

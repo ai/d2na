@@ -142,4 +142,11 @@ describe D2NA::MutableCode do
     end
     another.rules[1].object_id.should_not == @code.rules[1].object_id
   end
+  
+  it "should delete rule" do
+    @code.delete_rule(@code.rules[1])
+    @code.rules.length.should == 1
+    @code.length.should == 1
+    @code.conditions_cache[:Input].should be_empty
+  end
 end
