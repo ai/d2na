@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'rubygems'
+require 'faker'
 require 'set'
 
 module D2NA
@@ -41,8 +43,10 @@ module D2NA
       @conditions_permutations = [Set[]]
       @commands = []
       @mutation_params = {
-        :min_actions => 1, :max_actions => 3,
-        :add => 0.6,       :remove => 0.4
+        :min_actions => 1,       :max_actions => 3,
+        :min_state_actions => 3, :max_state_actions => 9,
+        :add => 0.5,             :remove => 0.3,
+        :add_state => 0.15,       :remove_state => 0.05
       }
       super(&block)
     end
@@ -131,14 +135,19 @@ module D2NA
       self
     end
     
-    # Add random changes to code. Parameters (optionaly):
+    # Add random changes to code. Parameters (optionally):
     # * +min_actions+/+max_actions+: min and max actions on one mutation;
+    # * +min_state_actions+/+max_state_actions+: min and max actions after
+    #   adding new state;
     # * +add+/+remove+: probability of adding or removing command;
+    # * +add_state+/+remove_state+: probability of adding or removing state.
     def mutate!(params)
       p = @mutation_params.merge(params)
-      sum = p[:add] + p[:remove]
-      count = rand(p[:max_actions] - p[:min_actions]).floor + p[:min_actions]
+      sum = p[:add] + p[:remove] + p[:add_state] + p[:remove_state]
+      state_actions = (p[:max_state_actions] - p[:min_state_actions]) / 3
+      min_state_actions = p[:min_state_actions] /= 3
       
+      count = rand(p[:max_actions] - p[:min_actions]).floor + p[:min_actions]
       modify do
         count.times do
           choice = sum * rand
@@ -148,9 +157,30 @@ module D2NA
             add_command rand(conditions_count),
                         *@commands[rand(@commands.length)]
             
-          else
+          elsif choice < p[:add] + p[:remove]
             # Remove command
             remove_command rand(length)
+            
+          elsif choice < sum - p[:remove_state]
+            # Add state
+            state = Faker::Name.first_name.downcase.to_sym
+            before_permutation = @conditions_permutations.length
+            before_conditions = conditions_count
+            before_commands = @commands.length
+            add_states(state)
+            conditions_diff = conditions_count - before_conditions
+            
+            state_count = rand(state_actions).floor + min_state_actions
+            state_count.times do
+              add_command rand(before_conditions), :up, state
+              add_command rand(before_conditions), :down, state
+              add_command before_conditions + rand(conditions_diff),
+                          *@commands[rand(@commands.length)]
+            end
+            
+          else
+            # Remove state
+            remove_state @states.keys[rand(@states.length)]
           end
         end
       end
