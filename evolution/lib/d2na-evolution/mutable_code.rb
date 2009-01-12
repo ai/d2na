@@ -28,11 +28,22 @@ module D2NA
     # Code, which be cloned to this one.
     attr_reader :parent
     
+    # Default mutation parameters. See +mutate+ for key description.
+    attr_reader :mutation_params
+    
+    # All available commands for this code
+    attr_reader :commands
+    
     # Create D²NA code. Block will be eval on new instance.
     def initialize(&block)
       @exists_conditions = Set[]
       @unused_conditions = []
       @conditions_permutations = [Set[]]
+      @commands = []
+      @mutation_params = {
+        :min_actions => 1, :max_actions => 3,
+        :add => 0.6,       :remove => 0.4
+      }
       super(&block)
     end
     
@@ -50,6 +61,13 @@ module D2NA
       end
     end
     
+    # Add new output +signals+. Return new signals.
+    def output(*signals)
+      super(*signals).each do |signal|
+        @commands << [:send, signal]
+      end
+    end
+    
     # Define +states+. State name must start from lower case latter
     # (for example, <tt>:state</tt>).
     def add_states(*states)
@@ -62,6 +80,7 @@ module D2NA
           end
           conditions
         end
+        @commands << [:up, state] << [:down, state]
       end
     end
     
@@ -112,6 +131,31 @@ module D2NA
       self
     end
     
+    # Add random changes to code. Parameters (optionaly):
+    # * +min_actions+/+max_actions+: min and max actions on one mutation;
+    # * +add+/+remove+: probability of adding or removing command;
+    def mutate!(params)
+      p = @mutation_params.merge(params)
+      sum = p[:add] + p[:remove]
+      count = rand(p[:max_actions] - p[:min_actions]).floor + p[:min_actions]
+      
+      modify do
+        count.times do
+          choice = sum * rand
+          
+          if choice < p[:add]
+            # Add command
+            add_command rand(conditions_count),
+                        *@commands[rand(@commands.length)]
+            
+          else
+            # Remove command
+            remove_command rand(length)
+          end
+        end
+      end
+    end
+    
     # Return Ruby representation of Code to save as file.
     def to_ruby
       'input  :' + (@input_signals - [:Init]).join(', :') + "\n" +
@@ -148,6 +192,8 @@ module D2NA
       @conditions_cache.delete(state)
       @conditions_permutations.delete_if { |i| i.include? state }
       @unused_conditions.delete_if { |i| i.include? state }
+      @commands.delete([:up, state])
+      @commands.delete([:down, state])
       @states.delete(state)
       modify do
         @rules.each_with_index do |rule, rule_number|
@@ -225,8 +271,8 @@ module D2NA
           @rules[rule_number] = rule
           rule.commands.delete_at(position)
           @modified_rules << rule
+          @length -= 1
         end
-        @length -= 1
         rule
       else
         before = 0

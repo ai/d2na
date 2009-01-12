@@ -172,4 +172,17 @@ describe D2NA::MutableCode do
     code.rules.length.should == 1
     code.rules[0].commands.should == [[:send, :Output]]
   end
+  
+  it "should has all available commands list" do
+    @code.commands.should == [[:up, :waiting], [:down, :waiting], 
+                              [:send, :Output]]
+  end
+  
+  it "should mutate commands" do
+    @code.mutate!(:add => 1, :remove => 0, :min_actions => 3)
+    @code.length.should == 6
+    
+    @code.mutate!(:add => 0, :remove => 1, :max_actions => 1)
+    @code.length.should == 5
+  end
 end
