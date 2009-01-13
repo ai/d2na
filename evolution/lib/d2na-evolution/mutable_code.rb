@@ -193,14 +193,10 @@ module D2NA
       'input  :' + (@input_signals - [:Init]).join(', :') + "\n" +
       'output :' + @output_signals.join(', :') + 
       @rules.inject('') do |all, rule|
-        if 0 == rule.commands.length
-          all
-        else
-          all + "\n\n" +
-          'on :' + rule.conditions.join(', :') + " do\n" +
-            rule.commands.inject('') { |all, i| all + "  #{i[0]} :#{i[1]}\n" } +
-          'end'
-        end
+        all + "\n\n" +
+        'on :' + rule.conditions.join(', :') + " do\n" +
+          rule.commands.inject('') { |a, i| a + "  " + i.join(' :') + "\n" } +
+        'end'
       end
     end
     

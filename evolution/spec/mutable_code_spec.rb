@@ -101,23 +101,6 @@ describe D2NA::MutableCode do
                             "end"
   end
   
-  it "shouldn't convert to Ruby empty rules" do
-    code = D2NA::MutableCode.new do
-      on :Init do
-      end
-      on :Input do
-        send :Output
-      end
-    end
-    
-    code.to_ruby.should == "input  :Input\n" +
-                           "output :Output\n" +
-                           "\n" +
-                           "on :Input do\n" +
-                           "  send :Output\n" +
-                           "end"
-  end
-  
   it "should clone rule on write" do
     another = @code.clone
     
