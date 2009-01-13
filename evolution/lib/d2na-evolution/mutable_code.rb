@@ -163,7 +163,9 @@ module D2NA
             
           elsif choice < sum - p[:remove_state]
             # Add state
-            state = Faker::Name.first_name.downcase.to_sym
+            begin
+              state = Faker::Name.first_name.downcase.to_sym
+            end while @states.keys.include? state
             before_permutation = @conditions_permutations.length
             before_conditions = conditions_count
             before_commands = @commands.length
@@ -219,12 +221,6 @@ module D2NA
       @conditions_cache[state].each do |rule|
         delete_rule(rule)
       end
-      @conditions_cache.delete(state)
-      @conditions_permutations.delete_if { |i| i.include? state }
-      @unused_conditions.delete_if { |i| i.include? state }
-      @commands.delete([:up, state])
-      @commands.delete([:down, state])
-      @states.delete(state)
       modify do
         @rules.each_with_index do |rule, rule_number|
           rule.commands.each_with_index do |command, command_number|
@@ -235,6 +231,12 @@ module D2NA
           end
         end
       end
+      @conditions_cache.delete(state)
+      @conditions_permutations.delete_if { |i| i.include? state }
+      @unused_conditions.delete_if { |i| i.include? state }
+      @commands.delete([:up, state])
+      @commands.delete([:down, state])
+      @states.delete(state)
     end
     
     # Count of all conditions wich can be with this states and input signals.
