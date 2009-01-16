@@ -141,7 +141,7 @@ module D2NA
     #   adding new state;
     # * +add+/+remove+: probability of adding or removing command;
     # * +add_state+/+remove_state+: probability of adding or removing state.
-    def mutate!(params)
+    def mutate!(params = {})
       p = @mutation_params.merge(params)
       sum = p[:add] + p[:remove] + p[:add_state] + p[:remove_state]
       state_actions = (p[:max_state_actions] - p[:min_state_actions]) / 3

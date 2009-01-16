@@ -2,3 +2,8 @@
 
 D²NA is a project to find out, could we generate code by genetic algorithm as it
 did evolution for DNA.
+
+It contain two subprojects:
+* D²NA&nbsp;Language[file:vm/README_rdoc.html] – simple, mutable programming language.
+* D²NA&nbsp;Evolution[file:evolution/README_rdoc.html] – tool to generate code on D²NA
+  language.
