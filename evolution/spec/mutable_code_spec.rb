@@ -72,19 +72,19 @@ describe D2NA::MutableCode do
       add_command 4, :send, :Output
     end
     
-    @code.rules.length.should == 3
+    @code.should have(3).rules
     @code.rules[2].conditions.should == [:waiting, :Input]
     @code.rules[2].commands.should == [[:send, :Output]]
     @code.conditions_cache[:waiting].should == [@code.rules[2]]
   end
   
   it "should delete empty rule" do
-    unused = @code.unused_conditions.length
-    @code.modify do
-      remove_command(0)
-    end
-    @code.rules.length.should == 1
-    @code.unused_conditions.length.should == unused + 1
+    lambda {
+      @code.modify do
+        remove_command(0)
+      end
+    }.should change(@code.unused_conditions, :length).by(1)
+    @code.should have(1).rules
   end
   
   it "should convert Code to Ruby" do
@@ -112,8 +112,8 @@ describe D2NA::MutableCode do
     another.rules[1].should equal(@code.rules[1])
     
     another.on :Two
-    @code.rules.length.should == 2
-    @code.input_signals.length.should == 3
+    @code.should have(2).rules
+    @code.should have(3).input_signals
     @code.instance_variable_get(:@exists_conditions).length.should == 2
     
     another.modify do
@@ -131,7 +131,7 @@ describe D2NA::MutableCode do
   it "should delete rule" do
     unused = @code.unused_conditions.length
     @code.delete_rule(@code.rules[1])
-    @code.rules.length.should == 1
+    @code.should have(1).rules
     @code.length.should == 1
     @code.conditions_cache[:Input].should be_empty
     @code.unused_conditions.length.should == unused + 1
@@ -152,7 +152,7 @@ describe D2NA::MutableCode do
     code.states.keys.should_not include(:waiting)
     code.unused_conditions.length.should == 1
     code.conditions_cache.keys.should_not include(:waiting)
-    code.rules.length.should == 1
+    code.should have(1).rules
     code.rules[0].commands.should == [[:send, :Output]]
   end
   
@@ -175,11 +175,11 @@ describe D2NA::MutableCode do
     @code.mutation_params.merge!(:add => 0, :remove => 0, :max_actions => 1)
     
     @code.mutate!(:add_state => 1, :remove_state => 0, :min_state_actions => 3)
-    @code.states.length.should == 2
-    @code.rules.length.should > 2
-    @code.commands.length.should == 5
+    @code.should have(2).states
+    @code.should have_at_least(1).rules
+    @code.should have(5).commands
     
     @code.mutate!(:add_state => 0, :remove_state => 1)
-    @code.states.length.should == 1
+    @code.should have(1).states
   end
 end

@@ -13,7 +13,7 @@ describe D2NA::Code do
       end
     end
     
-    code.rules.length.should == 2
+    code.should have(2).rules
     
     code.rules[0].conditions.should == [:Input]
     code.rules[0].commands.should == [[:up, :state], [:send, :Output]]
@@ -44,7 +44,7 @@ describe D2NA::Code do
   it "should add new state" do
     code = D2NA::Code.new
     code.add_states(:one, :one, :two).should == [:one, :two]
-    code.states.length.should == 2
+    code.should have(2).states
   end
   
   it "should raise error if state if capitalized" do

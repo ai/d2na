@@ -13,7 +13,7 @@ describe D2NA::Console do
   end
   
   it "should load code and rules" do
-    @console.code.rules.length.should == 1
+    @console.code.should have(1).rules
     @console.code.rules[0].conditions.should == [:Input]
     @console.code.rules[0].commands.should == [[:send, :Output]]
   end
