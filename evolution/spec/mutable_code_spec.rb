@@ -73,7 +73,7 @@ describe D2NA::MutableCode do
     end
     
     @code.should have(3).rules
-    @code.rules[2].conditions.should == [:waiting, :Input]
+    @code.rules[2].conditions.to_set.should == [:waiting, :Input].to_set
     @code.rules[2].commands.should == [[:send, :Output]]
     @code.conditions_cache[:waiting].should == [@code.rules[2]]
   end

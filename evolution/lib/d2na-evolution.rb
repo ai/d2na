@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
 require 'pathname'
-dir = Pathname(__FILE__).dirname.expand_path
+dir = Pathname(__FILE__).dirname.expand_path + 'd2na-evolution'
 
 begin
-  require dir + '../../vm/lib/d2na-vm'
+  require dir + '../../../vm/lib/d2na-vm'
 rescue LoadError
   puts "Error: Cann't load D2NA Virtual Machine"
   exit
 end
 
-require dir + 'd2na-evolution/mutable_code'
+require dir + 'mutable_code'
+require dir + 'test_result'
