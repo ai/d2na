@@ -23,7 +23,7 @@ dir = Pathname(__FILE__).dirname.expand_path + 'd2na-evolution'
 begin
   require dir + '../../../vm/lib/d2na-vm'
 rescue LoadError
-  puts "Error: Cann't load D2NA Virtual Machine"
+  puts "Error: Can't load D2NA Virtual Machine"
   exit
 end
 

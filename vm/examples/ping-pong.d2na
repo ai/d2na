@@ -2,7 +2,6 @@
 
 input  :Print # Command to write next word
 output :Ping, :Pong
-state  :ping, :pong
 
 # Initialize first state
 on :Init do

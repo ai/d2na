@@ -3,16 +3,20 @@
 on :A do
   up :mem
 end
+
 on :B do
   up :mem
 end
+
 on :Print do
   up :printing
 end
+
 on :mem, :printing do
   send :C
   down :mem
 end
+
 on :A, :printing do
   down :printing
 end
