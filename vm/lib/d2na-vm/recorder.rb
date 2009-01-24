@@ -1,7 +1,7 @@
 =begin
-Main file to load all neccessary classes for D²NA virtual machine.
+Record output signals from D²NA code.
 
-Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
+Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,13 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pathname'
-
 module D2NA
-  dir = Pathname(__FILE__).dirname.expand_path + 'd2na-vm'
-  require dir + 'rule'
-  require dir + 'code'
-  
-  autoload :Console,  (dir + 'console').to_s
-  autoload :Recorder, (dir + 'recorder').to_s
+  # Array to record output signals from Code.
+  class Recorder < ::Array
+    # Code to record.
+    attr_reader :code
+    
+    # Start recording signals from +code+.
+    def initialize(code)
+      super(0)
+      @signals = []
+      @code = code
+      @code.listen &method(:dispatch)
+    end
+    
+    # Record new output signal. It will called by code.
+    def dispatch(code, signal)
+      self << signal
+    end
+  end
 end

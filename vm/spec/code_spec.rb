@@ -106,7 +106,7 @@ describe D2NA::Code do
   end
   
   it "should run rule on input signal" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Input do
         send :One
       end
@@ -114,13 +114,14 @@ describe D2NA::Code do
         send :Two
       end
     end
+    out = D2NA::Recorder.new(code)
     
     code << :Input
-    code.out.should == [:One]
+    out.should == [:One]
   end
   
   it "should run rule on input signals and states" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Input do
         send :Get
         up :state
@@ -131,18 +132,20 @@ describe D2NA::Code do
         down :state
       end
     end
+    out = D2NA::Recorder.new(code)
     
     code << :Input
-    code.out.should == [:Get]
+    out.should == [:Get]
     code.states[:state].should == 1
+    out.clear
     
     code << :Input
-    code.out.should == [:Get, :State]
+    out.should == [:Get, :State]
     code.states[:state].should == 0
   end
   
   it "should run rule by state" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Save do
         up :memory
       end
@@ -154,14 +157,15 @@ describe D2NA::Code do
         down :memory
       end
     end
+    out = D2NA::Recorder.new(code)
     
     code << :Save << :Save << :Save
     code << :Print
-    code.out.should == [:Output, :Output, :Output]
+    out.should == [:Output, :Output, :Output]
   end
   
   it "should start rules as layers" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :First do
         up :start
       end
@@ -178,14 +182,15 @@ describe D2NA::Code do
         down :state
       end
     end
+    out = D2NA::Recorder.new(code)
     
     code << :First
     code << :Input
-    code.out.should be_empty
+    out.should be_empty
   end
   
   it "should has initialization signal" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Init do
         send :Started
       end
@@ -194,19 +199,21 @@ describe D2NA::Code do
       end
     end
     
+    out = D2NA::Recorder.new(code)
     code.started?.should be_false
     code.start
-    code.out.should == [:Started]
+    out.should == [:Started]
     code.started?.should be_true
     code.reset!
     
+    out = D2NA::Recorder.new(code)
     code << :Input
-    code.out.should == [:Started, :Work]
+    out.should == [:Started, :Work]
     code.started?.should be_true
   end
   
   it "should reset states and listeners" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Init do
         up :memory
       end
@@ -231,7 +238,7 @@ describe D2NA::Code do
   end
   
   it "should be protected from infinite recursion" do
-    code = RecorderCode.new do
+    code = D2NA::Code.new do
       on :Init do
         up :infinity
       end
