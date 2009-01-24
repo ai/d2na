@@ -78,6 +78,9 @@ module D2NA
     # Hash of states with name (Symbol) as key and it value (Number) as value.
     attr_reader :states
     
+    # How many conditions for some Rule aren’t satisfied.
+    attr_reader :required
+    
     # Hash with condition as key and dependency rules as value.
     attr_reader :conditions_cache
     
@@ -95,6 +98,7 @@ module D2NA
       @output_signals = []
       @states = {}
       @conditions_cache = {}
+      @required = {}
       @max_depth = 100
       input :Init
       reset!
@@ -136,6 +140,7 @@ module D2NA
     def on(*conditions, &block)
       rule = Rule.new(conditions, self, &block)
       @rules << rule
+      @required[rule] = rule.conditions.length
       rule.conditions.each { |c| @conditions_cache[c] << rule }
       rule
     end
@@ -182,7 +187,7 @@ module D2NA
       
       check_signal_name(signal)
       @conditions_cache[signal].each do |rule|
-        rule.call(self) if 1 == rule.required
+        rule.call(self) if 1 == @required[rule]
       end
       
       rule_to_run = {}
@@ -190,8 +195,8 @@ module D2NA
         break if @diff.empty? and rule_to_run.empty?
         @diff.each_pair do |state, diff|
           @conditions_cache[state].each do |rule|
-            rule.required -= diff
-            rule_to_run[rule] = (0 == rule.required)
+            @required[rule] -= diff
+            rule_to_run[rule] = (0 == @required[rule])
           end
         end
         @diff = {}

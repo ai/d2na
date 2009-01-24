@@ -101,6 +101,26 @@ describe D2NA::MutableCode do
                             "end"
   end
   
+  it "should clone rule" do
+    code = D2NA::MutableCode.new do
+      on :Input do
+        up :lock
+      end
+      on :Input, :lock do
+        send :Output
+      end
+    end
+    code_out = D2NA::Recorder.new(code)
+    
+    another = code.clone
+    another_out = D2NA::Recorder.new(another)
+    
+    code << :Input
+    another << :Input
+    code_out.should == []
+    another_out.should == []
+  end
+  
   it "should clone rule on write" do
     another = @code.clone
     

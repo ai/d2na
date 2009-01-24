@@ -35,14 +35,10 @@ module D2NA
     # (send output signal). Name should be state or output signal name.
     attr_reader :commands
     
-    # How many conditions aren’t satisfied.
-    attr_accessor :required
-    
     # Create D²NA rule for +creator+ Code with special +conditions+. In block
     # you can call +up+, +down+ and +send+ methods to add commands.
     def initialize(conditions, creator = nil, &block)
       @conditions = conditions
-      @required = conditions.length
       @commands = []
       @output = []
       @states = []
