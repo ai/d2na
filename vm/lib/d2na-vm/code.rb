@@ -99,6 +99,8 @@ module D2NA
       @states = {}
       @conditions_cache = {}
       @required = {}
+      @listeners_all = []
+      @listeners_signals = {}
       @max_depth = 100
       input :Init
       reset!
@@ -178,6 +180,12 @@ module D2NA
         end
       end
     end
+    
+    # Delete all signal listeners.
+    def delete_listeners!
+      @listeners_all = []
+      @listeners_signals = {}
+    end
 
     # Send input +signal+ into Code. Signal name must start from upper case
     # letter.
@@ -254,8 +262,6 @@ module D2NA
     
     # Reset all states and delete listeners.
     def reset!
-      @listeners_all = []
-      @listeners_signals = {}
       @started = false
       @diff = {}
       @states.each_key { |i| @states[i] = 0 }

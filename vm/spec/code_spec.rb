@@ -105,6 +105,21 @@ describe D2NA::Code do
     code.send_out :One
   end
   
+  it "should delete listeners" do
+    code = D2NA::Code.new do
+      on :Input do
+        send :Output
+      end
+    end
+    mock = mock('listener', :dispatch => true)
+    code.listen &mock.method(:dispatch)
+    
+    code.delete_listeners!
+    
+    mock.should_not_receive(:dispatch)
+    code << :Input
+  end
+  
   it "should run rule on input signal" do
     code = D2NA::Code.new do
       on :Input do
@@ -212,7 +227,7 @@ describe D2NA::Code do
     code.started?.should be_true
   end
   
-  it "should reset states and listeners" do
+  it "should reset states" do
     code = D2NA::Code.new do
       on :Init do
         up :memory
@@ -223,15 +238,11 @@ describe D2NA::Code do
     end
     code << :Input
     
-    mock = mock('listener', :dispatch => true)
-    code.listen &mock.method(:dispatch)
-    
     code.reset!
     
     code.started?.should be_false
     code.states[:memory].should == 0
     
-    mock.should_not_receive(:dispatch)
     code << :Input
     code.started?.should be_true
     code.states[:memory].should == 2
