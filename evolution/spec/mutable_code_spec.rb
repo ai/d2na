@@ -101,7 +101,7 @@ describe D2NA::MutableCode do
                             "end"
   end
   
-  it "should clone rule" do
+  it "should clone code" do
     code = D2NA::MutableCode.new do
       on :Input do
         up :lock
@@ -115,26 +115,25 @@ describe D2NA::MutableCode do
     another = code.clone
     another_out = D2NA::Recorder.new(another)
     
+    another.should_not equal(code)
+    another.parent.should equal(code)
+    
     code << :Input
     another << :Input
     code_out.should == []
     another_out.should == []
+    
+    another.on :Two
+    code.should have(2).rules
+    code.should have(2).input_signals
+    code.instance_variable_get(:@exists_conditions).length.should == 2
   end
   
   it "should clone rule on write" do
     another = @code.clone
     
-    another.should_not equal(@code)
-    another.parent.should equal(@code)
-    
-    another.rules.should_not equal(@code.rules)
     another.rules[0].should equal(@code.rules[0])
     another.rules[1].should equal(@code.rules[1])
-    
-    another.on :Two
-    @code.should have(2).rules
-    @code.should have(3).input_signals
-    @code.instance_variable_get(:@exists_conditions).length.should == 2
     
     another.modify do
       add_command 0, :down, :waiting
