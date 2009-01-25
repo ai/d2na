@@ -32,6 +32,9 @@ module D2NA
     # Recorded output signals from +code+.
     attr_reader :out
     
+    # Count of each recorded output signal.
+    attr_reader :output_signals
+    
     # Constructor.
     def initialize
       @tests = []
@@ -103,11 +106,19 @@ module D2NA
       end
     end
     
-    # Match that out is empty
+    # Match that out is empty. +options+ may include <tt>:priority</tt>.
+    #
+    #   out_should_be_empty :priority => 2
     def out_should_be_empty(options = {})
       priority = options[:priority] || @current_priority
       @result.match(@out.empty?, priority)
       @result.min(@out.length, priority)
+    end
+    
+    # Delete all recorded output signals.
+    def clear_out
+      @output_signals.clear
+      @out.clear
     end
     
     # Send signals to +code+.

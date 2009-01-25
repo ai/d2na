@@ -127,4 +127,15 @@ describe D2NA::Tests do
     result.sum_to_min.should == 3
   end
   
+  it "should clear out" do
+    @tests.add do
+      send :Input, :A
+      clear_out
+    end
+    @tests.run(@code)
+    
+    @tests.out.should be_empty
+    @tests.output_signals.should be_empty
+  end
+  
 end
