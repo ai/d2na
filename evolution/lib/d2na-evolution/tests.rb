@@ -50,5 +50,32 @@ module D2NA
       end
       @result
     end
+    
+    protected
+    
+    # Shortcut to <tt>result.match</tt> to add boolean test. +options+ may
+    # include <tt>:priority</tt>.
+    #
+    #   should 1 == var
+    #   should 2 == count, :priority => 2
+    def should(test, options = {})
+      @result.match(test, options[:priority] || @current_priority)
+    end
+    
+    # Shortcut to <tt>result.min</tt> to add +value+ that should be min.
+    # +options+ may include <tt>:priority</tt>.
+    #
+    #   min errors, :priority => 2
+    def min(value, options = {})
+      @result.min(value, options[:priority] || @current_priority)
+    end
+    
+    # Shortcut to <tt>result.max</tt> to add +value+ that should be max.
+    # +options+ may include <tt>:priority</tt>.
+    #
+    #   max count, :priority => 2
+    def max(value, options = {})
+      @result.max(value, options[:priority] || @current_priority)
+    end
   end
 end
