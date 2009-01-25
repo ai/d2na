@@ -21,4 +21,15 @@ describe D2NA::Tests do
     @tests.tests[1][2].should == 1
   end
   
+  it "should run tests" do
+    my_code = D2NA::Code.new
+    @tests.add 'my test', 2 do
+      result.match(code.should == my_code)
+    end
+    result = @tests.run(my_code)
+    
+    result.should be_success
+    result.should have(1).tests
+  end
+  
 end

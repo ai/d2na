@@ -39,5 +39,16 @@ module D2NA
     def add(description = nil, priority = 1, &block)
       @tests << [block, description, priority] if block_given?
     end
+    
+    # Run test for +code+ and return it result.
+    def run(code)
+      @code = code
+      @result = TestResult.new
+      @tests.each do |test, description, priority|
+        @current_priority = priority
+        instance_eval &test
+      end
+      @result
+    end
   end
 end
