@@ -4,9 +4,18 @@ describe D2NA::Tests do
   
   before do
     @tests = D2NA::Tests.new
+    @code = D2NA::Code.new do
+      on :Input do
+        send :Output
+      end
+      on :A do
+        send :B
+      end
+    end
+    @out = D2NA::Recorder.new(@code)
   end
   
-  it "should store tests" do
+  it "should store and run tests" do
     @tests.add 'my test', 2 do
       result.match(false)
     end
@@ -19,6 +28,8 @@ describe D2NA::Tests do
     @tests.tests[0][2].should == 2
     @tests.tests[1][1].should == nil
     @tests.tests[1][2].should == 1
+    
+    @tests.run(@code)
   end
   
   it "should run tests" do
@@ -38,7 +49,7 @@ describe D2NA::Tests do
       min 1
       max 10
     end
-    result = @tests.run(nil)
+    result = @tests.run(@code)
     
     result.should have(1).tests
     result.should have(1).to_max
@@ -55,11 +66,20 @@ describe D2NA::Tests do
       min 1, :priority => 3
       max 10, :priority => 3
     end
-    result = @tests.run(nil)
+    result = @tests.run(@code)
     
     result.score.should == 3
     result.sum_to_min.should == 3
     result.sum_to_max.should == 30
+  end
+  
+  it "should send signals to code" do
+    @tests.add do
+      send :Input, :A
+    end
+    @tests.run(@code)
+    
+    @out.should == [:Output, :B]
   end
   
 end

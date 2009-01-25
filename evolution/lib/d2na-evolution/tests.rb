@@ -43,15 +43,22 @@ module D2NA
     # Run test for +code+ and return it result.
     def run(code)
       @code = code
+      
       @result = TestResult.new
       @tests.each do |test, description, priority|
         @current_priority = priority
         instance_eval &test
+        @code.reset!
       end
       @result
     end
-    
+  
     protected
+    
+    # Send signals to +code+.
+    def send(*signals)
+      signals.each { |i| code << i }
+    end
     
     # Shortcut to <tt>result.match</tt> to add boolean test. +options+ may
     # include <tt>:priority</tt>.
