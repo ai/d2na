@@ -40,8 +40,8 @@ module D2NA
       @tests = []
     end
     
-    # Add new test as block with +description+ and +priority+. It should be
-    # eval on this instance.
+    # Add new test as block with +description+ and default +priority+. Test
+    # will be evaled on Tests instance.
     def add(description = nil, priority = 1, &block)
       @tests << [block, description, priority] if block_given?
     end
@@ -61,16 +61,17 @@ module D2NA
       end
       @result
     end
-    
-    # Record output signal from +code+.
-    def record_signal(code, signal)
-      @output_signals[signal] += 1
-    end
   
     protected
     
-    # Match all output signals count. In first argument put signal
-    # name as key and count as value. You can also use key <tt>:priority</tt>.
+    # Record output signal from +code+. It called from +code+ as listener.
+    def record_signal(code, signal)
+      @output_signals[signal] += 1
+    end
+    
+    # Match all output signals count. In first argument put signals name as key
+    # and it count as value. You can also use key <tt>:priority</tt>.
+    # To check order use +out+ property.
     #
     #   out_should :A => 1, :B => 5, :priority => 2
     def out_should(signals)
@@ -94,7 +95,7 @@ module D2NA
     end
     
     # Match some output signals count. It is like +out_should+ but didn’t match
-    # signals, that you didn’t set in signals.
+    # signals, that you didn’t set in +signals+.
     def out_should_has(signals)
       priority = signals[:priority] || @current_priority
       signals.delete :priority
@@ -126,16 +127,16 @@ module D2NA
       signals.each { |i| code << i }
     end
     
-    # Shortcut to <tt>result.match</tt> to add boolean test. +options+ may
+    # Shortcut for <tt>result.match</tt> to add boolean test. +options+ may
     # include <tt>:priority</tt>.
     #
-    #   should 1 == var
+    #   should array.empty?
     #   should 2 == count, :priority => 2
     def should(test, options = {})
       @result.match(test, options[:priority] || @current_priority)
     end
     
-    # Shortcut to <tt>result.min</tt> to add +value+ that should be min.
+    # Shortcut for <tt>result.min</tt> to add +value+ that should be min.
     # +options+ may include <tt>:priority</tt>.
     #
     #   min errors, :priority => 2
@@ -143,7 +144,7 @@ module D2NA
       @result.min(value, options[:priority] || @current_priority)
     end
     
-    # Shortcut to <tt>result.max</tt> to add +value+ that should be max.
+    # Shortcut for <tt>result.max</tt> to add +value+ that should be max.
     # +options+ may include <tt>:priority</tt>.
     #
     #   max count, :priority => 2
