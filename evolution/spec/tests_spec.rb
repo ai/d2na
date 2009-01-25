@@ -112,4 +112,19 @@ describe D2NA::Tests do
     result.sum_to_min.should == 0
   end
   
+  it "should match empty out" do
+    @tests.add nil, 3 do
+      out_should_be_empty :priority => 2
+      send :Input
+      out_should_be_empty
+    end
+    result = @tests.run(@code)
+    
+    result.should_not be_success
+    result.should have(2).tests
+    result.should have(2).to_min
+    result.score.should == 2
+    result.sum_to_min.should == 3
+  end
+  
 end

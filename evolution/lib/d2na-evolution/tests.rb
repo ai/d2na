@@ -29,6 +29,9 @@ module D2NA
     # Current code to test.
     attr_reader :code
     
+    # Recorded output signals from +code+.
+    attr_reader :out
+    
     # Constructor.
     def initialize
       @tests = []
@@ -43,6 +46,7 @@ module D2NA
     # Run test for +code+ and return it result.
     def run(code)
       @code = code
+      @out = D2NA::Recorder.new(@code)
       @code.listen &method(:record_signal)
       @output_signals = Hash.new(0)
       
@@ -97,6 +101,13 @@ module D2NA
         @result.match(count == exists, priority)
         @result.min((exists - count).abs, priority)
       end
+    end
+    
+    # Match that out is empty
+    def out_should_be_empty(options = {})
+      priority = options[:priority] || @current_priority
+      @result.match(@out.empty?, priority)
+      @result.min(@out.length, priority)
     end
     
     # Send signals to +code+.
