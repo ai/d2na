@@ -43,6 +43,8 @@ module D2NA
     # Run test for +code+ and return it result.
     def run(code)
       @code = code
+      @code.listen &method(:record_signal)
+      @output_signals = Hash.new(0)
       
       @result = TestResult.new
       @tests.each do |test, description, priority|
@@ -52,8 +54,37 @@ module D2NA
       end
       @result
     end
+    
+    # Record output signal from +code+.
+    def record_signal(code, signal)
+      @output_signals[signal] += 1
+    end
   
     protected
+    
+    # Match all output signals count from +code+. In first argument put signal
+    # name as key and count as value. You can also use key <tt>:priority</tt>.
+    #
+    #   out_should :A => 1, :B => 5, :priority => 2
+    def out_should(signals)
+      priority = signals[:priority] || @current_priority
+      signals.delete :priority
+      
+      bad = 0
+      @code.output_signals.each do |name|
+        exists = @output_signals[name]
+        if signals.has_key? name
+          count = signals[name]
+          @result.match(count == exists, priority)
+          @result.min((exists - count).abs, priority)
+        else
+          bad += exists
+        end
+      end
+      
+      @result.match(0 == bad, priority)
+      @result.min(bad, priority)
+    end
     
     # Send signals to +code+.
     def send(*signals)

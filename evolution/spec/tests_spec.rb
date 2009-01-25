@@ -82,4 +82,19 @@ describe D2NA::Tests do
     @out.should == [:Output, :B]
   end
   
+  it "should match output signals count" do
+    @tests.add do
+      send :Input, :Input, :A
+      out_should :Output => 2, :priority => 3
+    end
+    result = @tests.run(@code)
+    
+    result.should_not be_success
+    result.should have(2).tests
+    result.should have(2).to_min
+    
+    result.score.should == 3
+    result.sum_to_min.should == 3
+  end
+  
 end
