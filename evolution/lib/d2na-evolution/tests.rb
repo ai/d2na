@@ -107,6 +107,25 @@ module D2NA
       end
     end
     
+    # Match, that out doesn’t contain +signals+. You can also set
+    # <tt>:priority</tt> with value in last argument.
+    #
+    #   out_should_hasnt :A, :B, :priority => 2
+    def out_should_hasnt(*signals)
+      if Hash == signals.last.class and signals.last.has_key?(:priority)
+        priority = signals.last[:priority]
+        signals.delete_at(signals.length - 1)
+      else
+        priority = @current_priority
+      end
+      
+      signals.each do |name|
+        exists = @output_signals[name]
+        @result.match(0 == exists, priority)
+        @result.min(exists, priority)
+      end
+    end
+    
     # Match that out is empty. +options+ may include <tt>:priority</tt>.
     #
     #   out_should_be_empty :priority => 2
