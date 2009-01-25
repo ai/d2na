@@ -62,7 +62,7 @@ module D2NA
   
     protected
     
-    # Match all output signals count from +code+. In first argument put signal
+    # Match all output signals count. In first argument put signal
     # name as key and count as value. You can also use key <tt>:priority</tt>.
     #
     #   out_should :A => 1, :B => 5, :priority => 2
@@ -84,6 +84,19 @@ module D2NA
       
       @result.match(0 == bad, priority)
       @result.min(bad, priority)
+    end
+    
+    # Match some output signals count. It is like +out_should+ but didn’t match
+    # signals, that you didn’t set in signals.
+    def out_should_has(signals)
+      priority = signals[:priority] || @current_priority
+      signals.delete :priority
+      
+      signals.each_pair do |name, count|
+        exists = @output_signals[name]
+        @result.match(count == exists, priority)
+        @result.min((exists - count).abs, priority)
+      end
     end
     
     # Send signals to +code+.
