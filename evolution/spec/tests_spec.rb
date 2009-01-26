@@ -16,20 +16,14 @@ describe D2NA::Tests do
   end
   
   it "should store and run tests" do
-    @tests.add 'my test', 2 do
-      result.match(false)
-    end
-    @tests.add do
-      result.match(true)
-    end
+    @tests.add('my test', 2) { }
+    @tests.add { }
     
     @tests.tests.length.should == 2
     @tests.tests[0][1].should == 'my test'
     @tests.tests[0][2].should == 2
     @tests.tests[1][1].should == nil
     @tests.tests[1][2].should == 1
-    
-    @tests.run(@code)
   end
   
   it "should run tests" do
@@ -116,15 +110,16 @@ describe D2NA::Tests do
     @tests.add do
       send :A, :A
       out_should_hasnt :Output, :B, :priority => 2
+      out_should_hasnt :B
     end
     result = @tests.run(@code)
     
     result.should_not be_success
-    result.should have(2).tests
-    result.should have(2).to_min
+    result.should have(3).tests
+    result.should have(3).to_min
     
     result.score.should == 2
-    result.sum_to_min.should == 4
+    result.sum_to_min.should == 6
   end
   
   it "should match empty out" do
