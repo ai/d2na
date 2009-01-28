@@ -1,7 +1,7 @@
 =begin
-Main file to load all neccessary classes for D²NA evolution.
+Evolution worker to work with D²NA code.
 
-Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
+Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,18 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pathname'
-dir = Pathname(__FILE__).dirname.expand_path + 'd2na-evolution'
-
-begin
-  require dir + '../../../vm/lib/d2na-vm'
-rescue LoadError
-  puts "Error: Can't load D2NA Virtual Machine"
-  exit
+module D2NA
+  # Worker to do parallel tasks in evolution process.
+  class Worker
+    # Link to owner evolution.
+    attr_reader :evolution
+    
+    # Own cloned copy of tests from Evolution.
+    attr_reader :tests
+    
+    # Create new worker for some +evolution+. You must already create all tests
+    # in Tests instance.
+    def initialize(evolution)
+      @evolution = evolution
+      @tests = evolution.tests.dup
+    end
+  end
 end
-
-require dir + 'mutable_code'
-require dir + 'test_result'
-require dir + 'tests'
-require dir + 'evolution'
-require dir + 'worker'

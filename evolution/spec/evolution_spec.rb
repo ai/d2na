@@ -59,4 +59,13 @@ describe D2NA::Evolution do
     }.should raise_error ArgumentError, /didn't has mutate! method/
   end
   
+  it "should create workers" do
+    evolution = D2NA::Evolution.new do
+      worker_count 4
+    end
+    
+    evolution.worker_count.should == 4
+    evolution.should have(4).workers
+  end
+  
 end

@@ -21,16 +21,27 @@ module D2NA
   # Evolution controller.
   class Evolution
     # Code tests, which will direct evolution.
-    attr_accessor :tests
+    attr_reader :tests
     
     # First version of code to start evolution.
-    attr_accessor :protocode
+    attr_reader :protocode
+    
+    # Working count.
+    attr_reader :worker_count
+    
+    # Array of workers.
+    attr_reader :workers
     
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
+      @worker_count = 2
       instance_eval(&block) if block_given?
+      @workers = []
+      @worker_count.times do
+        @workers << Worker.new(self)
+      end
     end
     
     # Set first version of code, which will be used on first step. Usual first
@@ -48,7 +59,7 @@ module D2NA
     # * <tt>listen(*signals, &block)</tt> to add output signals listeners;
     # * <tt>mutate!</tt> to add random changes.
     #
-    # == Usage
+    # Usage:
     # 
     #   protocode do
     #     input :A
@@ -77,6 +88,23 @@ module D2NA
       end
     end
     
+    # Set workers count. If you didn’t set argument it return current count.
+    #
+    # Workers do parallel tasts in separated threads for performance on
+    # multicore processors. You should set as many workers, as you have CPU
+    # cores.
+    #
+    # Usage (for example on On Intel Core i7):
+    #
+    #   worker_count 4
+    def worker_count(count = nil)
+      if count.nil?
+        @worker_count
+      else
+        @worker_count = count
+      end
+    end
+    
     # Add new test for code, which will direct evolution. This test didn’t say
     # only success or fail, it say that some code has result better than
     # another, even if they are success or fail together.
@@ -100,7 +128,7 @@ module D2NA
     # <tt>:priority</tt> with value. See Tests documentation for all available
     # methods and information. 
     #
-    # == Usage
+    # Usage:
     # 
     #   selection "example test", :priority => 2 do
     #     out_should_be_empty
