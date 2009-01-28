@@ -30,3 +30,4 @@ end
 require dir + 'mutable_code'
 require dir + 'test_result'
 require dir + 'tests'
+require dir + 'evolution'

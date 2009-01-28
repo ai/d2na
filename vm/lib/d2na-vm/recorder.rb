@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module D2NA
   # Array to record output signals from Code.
+  #
+  #   out = D2NA::Recorder.new(code)
+  #   code << :A << :A
+  #   out #=> [:B, :B]
   class Recorder < ::Array
     # Code to record.
     attr_reader :code
