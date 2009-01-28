@@ -23,11 +23,58 @@ module D2NA
     # Code tests, which will direct evolution.
     attr_accessor :tests
     
+    # First version of code to start evolution.
+    attr_accessor :protocode
+    
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
       instance_eval(&block) if block_given?
+    end
+    
+    # Set first version of code, which will be used on first step. Usual first
+    # version of code specify only input and output signals (because mutation
+    # didn’t change I/O interface), but you can also specify default mutatation
+    # parameters or default rules.
+    #
+    # If you didn’t set object in first argument, you must set block, that will
+    # be eval on new MutableCode instance. If you call it without arguments and
+    # block, it return current protocode.
+    #
+    # First version must be instance of MutableCode, not simple Code. But you
+    # can use any another object, that has methods:
+    # * <tt><< signal</tt> to send input signal;
+    # * <tt>listen(*signals, &block)</tt> to add output signals listeners;
+    # * <tt>mutate!</tt> to add random changes.
+    #
+    # == Usage
+    # 
+    #   protocode do
+    #     input :A
+    #     output :B
+    #   end
+    # 
+    # Or with user code object:
+    # 
+    #   protocode MySuperDNA.new
+    def protocode(protocode = nil, &block)
+      if protocode.nil?
+        if block_given?
+          @protocode = MutableCode.new(&block)
+        else
+          return @protocode
+        end
+      else
+        unless protocode.kind_of? MutableCode
+          %w{<< listen mutate!}.each do |method|
+            unless protocode.methods.include? method
+              raise ArgumentError, "User protocode didn't has #{method} method"
+            end
+          end
+        end
+        @protocode = protocode
+      end
     end
     
     # Add new test for code, which will direct evolution. This test didn’t say
