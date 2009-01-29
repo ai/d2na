@@ -68,4 +68,13 @@ describe D2NA::Evolution do
     evolution.should have(4).workers
   end
   
+  it "should create first population" do
+    evolution = D2NA::Evolution.new do
+      first_population 5
+    end
+    
+    evolution.first_population.should == 5
+    pending('check population')
+  end
+  
 end

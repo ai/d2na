@@ -32,12 +32,17 @@ module D2NA
     # Array of workers.
     attr_reader :workers
     
+    # First population size.
+    attr_reader :first_population
+    
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
+      @first_population = 10
       @worker_count = 2
       instance_eval(&block) if block_given?
+      
       @workers = []
       @worker_count.times do
         @workers << Worker.new(self)
@@ -102,6 +107,22 @@ module D2NA
         @worker_count
       else
         @worker_count = count
+      end
+    end
+    
+    # Set first population size. If you didn’t set argument it return current
+    # value.
+    # 
+    # First popilation will be contain only clone of protocode without any
+    # changes. This parameter influence only in first steps, so there is
+    # no reason to change it in standart project.
+    #
+    #   first_population 10
+    def first_population(count = nil)
+      if count.nil?
+        @first_population
+      else
+        @first_population = count
       end
     end
     
