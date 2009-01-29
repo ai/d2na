@@ -54,6 +54,8 @@ module D2NA
     # didn’t change I/O interface), but you can also specify default mutatation
     # parameters or default rules.
     #
+    # Note, that you can use it only in constructor block.
+    #
     # If you didn’t set object in first argument, you must set block, that will
     # be eval on new MutableCode instance. If you call it without arguments and
     # block, it return current protocode.
@@ -94,6 +96,7 @@ module D2NA
     end
     
     # Set workers count. If you didn’t set argument it return current count.
+    # You can use it only in constructor block.
     #
     # Workers do parallel tasts in separated threads for performance on
     # multicore processors. You should set as many workers, as you have CPU
@@ -111,7 +114,7 @@ module D2NA
     end
     
     # Set first population size. If you didn’t set argument it return current
-    # value.
+    # value. You can use it only in constructor block.
     # 
     # First popilation will be contain only clone of protocode without any
     # changes. This parameter influence only in first steps, so there is
@@ -129,6 +132,8 @@ module D2NA
     # Add new test for code, which will direct evolution. This test didn’t say
     # only success or fail, it say that some code has result better than
     # another, even if they are success or fail together.
+    #
+    # Note, that you can use it only in constructor block.
     #
     # First argument is test description, like in RSpec. In second you can set
     # <tt>:priority</tt> with value. In block you can use:
