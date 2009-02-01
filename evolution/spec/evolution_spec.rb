@@ -76,7 +76,7 @@ describe D2NA::Evolution do
     end
     
     evolution.first_population.should == 5
-    evolution.population.codes.should == [code, code, code, code, code]
+    evolution.population.layers.should == [[code, code, code, code, code]]
   end
   
 end

@@ -46,7 +46,7 @@ module D2NA
       @tests << [block, description, priority] if block_given?
     end
     
-    # Run test for +code+ and return it result.
+    # Run test for +code+ and return it result. It isn’t thread safe!
     def run(code)
       @code = code
       @out = D2NA::Recorder.new(@code)

@@ -32,6 +32,7 @@ module D2NA
     # Create new population and fill to +size+ it by +protocode+ with it test
     # +result+.
     def initialize(size = 0, protocode = nil, result = nil)
+      @mutex = Mutex.new
       if size.zero?
         @codes = []
         @results = []
@@ -43,15 +44,25 @@ module D2NA
       end
     end
     
-    # Insert new +code+ with it test +result+ in population.
-    def add(code, result)
-      if @codes.empty?
-        @codes << code
-        @results << result
-        @layers << [code]
-      else
-        @codes << code
-        @layers[result_index(result)] << code
+    # Insert new +code+ with it test +result+ in population. It is thread safe.
+    def push(code, result)
+      @mutex.synchronize do
+        if @codes.empty?
+          @codes << code
+          @results << result
+          @layers << [code]
+        else
+          @codes << code
+          @layers[result_index(result)] << code
+        end
+      end
+    end
+    
+    # Remove and return last code. Note, that +results+ and +layers+ will be
+    # broken. It is thread safe.
+    def pop
+      @mutex.synchronize do
+        @codes.pop
       end
     end
     
