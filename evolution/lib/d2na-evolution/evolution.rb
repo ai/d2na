@@ -35,18 +35,25 @@ module D2NA
     # First population size.
     attr_reader :first_population
     
+    # Current population.
+    attr_reader :population
+    
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
       @first_population = 10
       @worker_count = 2
+      @protocode = MutableCode.new
       instance_eval(&block) if block_given?
       
       @workers = []
       @worker_count.times do
         @workers << Worker.new(self)
       end
+      
+      @population = D2NA::Population.new(@first_population,
+                                         @protocode, @tests.run(@protocode))
     end
     
     # Set first version of code, which will be used on first step. Usual first
@@ -79,7 +86,7 @@ module D2NA
     def protocode(protocode = nil, &block)
       if protocode.nil?
         if block_given?
-          @protocode = MutableCode.new(&block)
+          @protocode.instance_eval(&block)
         else
           return @protocode
         end
@@ -116,7 +123,7 @@ module D2NA
     # Set first population size. If you didn’t set argument it return current
     # value. You can use it only in constructor block.
     # 
-    # First popilation will be contain only clone of protocode without any
+    # First population will be contain only clone of protocode without any
     # changes. This parameter influence only in first steps, so there is
     # no reason to change it in standart project.
     #

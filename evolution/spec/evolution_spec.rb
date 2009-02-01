@@ -69,12 +69,14 @@ describe D2NA::Evolution do
   end
   
   it "should create first population" do
+    code = D2NA::MutableCode.new
     evolution = D2NA::Evolution.new do
+      protocode code
       first_population 5
     end
     
     evolution.first_population.should == 5
-    pending('check population')
+    evolution.population.codes.should == [code, code, code, code, code]
   end
   
 end

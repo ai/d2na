@@ -1,5 +1,5 @@
 =begin
-Test result.
+Test result for D²NA code.
 
 Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
