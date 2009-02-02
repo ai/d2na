@@ -7,7 +7,6 @@ describe D2NA::Population do
     result = D2NA::TestResult.new
     population = D2NA::Population.new(5, code, result)
     
-    population.codes.should == [code, code, code, code, code]
     population.results.should == [result]
     population.layers.should == [[code, code, code, code, code]]
   end
@@ -22,7 +21,6 @@ describe D2NA::Population do
     population.push(1, 1.0)
     population.push(2, 2.0)
     
-    population.codes.should == [1, 3, 2, 1, 4, 1, 2]
     population.results.should == [1.0, 2.0, 3.0, 4.0]
     population.layers.should == [[1, 1, 1], [2, 2], [3], [4]]
     
@@ -34,8 +32,10 @@ describe D2NA::Population do
     population.push(1, 1.0)
     population.push(2, 2.0)
     population.push(3, 3.0)
+    population.push(2, 2.0)
     
     population.pop.should == 3
+    population.pop.should == 2
     population.pop.should == 2
     population.pop.should == 1
   end

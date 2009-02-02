@@ -20,9 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 module D2NA
   # Collection of codes grouped by test results.
   class Population
-    # Codes in population.
-    attr_accessor :codes
-    
     # Test results for codes in population.
     attr_accessor :results
     
@@ -34,35 +31,34 @@ module D2NA
     def initialize(size = 0, protocode = nil, result = nil)
       @mutex = Mutex.new
       if size.zero?
-        @codes = []
         @results = []
         @layers = []
       else
-        @codes = Array.new(size, protocode)
         @results = [result]
-        @layers = [@codes.clone]
+        @layers = [Array.new(size, protocode)]
       end
     end
     
     # Insert new +code+ with it test +result+ in population. It is thread safe.
     def push(code, result)
       @mutex.synchronize do
-        if @codes.empty?
-          @codes << code
+        if @layers.empty?
           @results << result
           @layers << [code]
         else
-          @codes << code
           @layers[result_index(result)] << code
         end
       end
     end
     
-    # Remove and return last code. Note, that +results+ and +layers+ will be
-    # broken. It is thread safe.
+    # Remove and return last code. It is thread safe.
     def pop
       @mutex.synchronize do
-        @codes.pop
+        if @layers.last.empty?
+          @layers.pop
+          @results.pop
+        end
+        @layers.last.pop
       end
     end
     
