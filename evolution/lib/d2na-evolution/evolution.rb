@@ -42,6 +42,12 @@ module D2NA
     # Current population.
     attr_reader :population
     
+    # Best result of previous step.
+    attr_reader :last_best_result
+    
+    # Count of steps without new best result.
+    attr_reader :stagnation
+    
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
@@ -49,6 +55,7 @@ module D2NA
       @first_population = 10
       @worker_count = 2
       @protocode = MutableCode.new
+      @stagnation = 0
       instance_eval(&block) if block_given?
       
       @workers = []
@@ -190,9 +197,17 @@ module D2NA
     # Do next evolution iteration: clone, mutate and select population.
     def step!
       @old_population = @population
+      @last_best_result = @old_population.best_result
       @population = Population.new
+      
       @workers.each { |i| i.run }
       @workers.each { |i| i.thread.join }
+      
+      if @last_best_result == @population.best_result
+        @stagnation += 1
+      else
+        @stagnation = 0
+      end
     end
   end
 end

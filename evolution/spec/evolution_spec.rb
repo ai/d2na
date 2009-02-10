@@ -99,4 +99,26 @@ describe D2NA::Evolution do
     evolution.population.layers.should == [[code, code], [clone, clone]]
   end
   
+  it "should calculate stagnation" do
+    code = D2NA::MutableCode.new
+    code.stub!(:clone).and_return(code)
+    code.stub!(:mutate!)
+    evolution = D2NA::Evolution.new do
+      protocode code
+      selection do
+        should 1 == @code.output_signals.length
+      end
+    end
+    
+    evolution.stagnation.should == 0
+    evolution.step!
+    evolution.stagnation.should == 1
+    evolution.step!
+    evolution.stagnation.should == 2
+    
+    code.output :A
+    evolution.step!
+    evolution.stagnation.should == 0
+  end
+  
 end
