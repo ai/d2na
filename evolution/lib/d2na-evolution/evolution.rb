@@ -35,6 +35,9 @@ module D2NA
     # First population size.
     attr_reader :first_population
     
+    # Population from previous step.
+    attr_reader :old_population
+    
     # Current population.
     attr_reader :population
     
@@ -109,7 +112,7 @@ module D2NA
     # multicore processors. You should set as many workers, as you have CPU
     # cores.
     #
-    # Usage (for example on On Intel Core i7):
+    # Usage (for example on Intel Core i7):
     #
     #   worker_count 4
     def worker_count(count = nil)
@@ -180,7 +183,15 @@ module D2NA
         options = description
         description = nil
       end
-      @tests.add(description, options[:priority], &block)
+      @tests.add(description, options[:priority] || 1, &block)
+    end
+    
+    # Do next evolution iteration: clone, mutate and select population.
+    def step!
+      @old_population = @population
+      @population = Population.new
+      @workers.each { |i| i.run }
+      @workers.each { |i| i.thread.join }
     end
   end
 end

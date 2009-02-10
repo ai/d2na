@@ -26,11 +26,39 @@ module D2NA
     # Own cloned copy of tests from Evolution.
     attr_reader :tests
     
+    # Worker thread.
+    attr_reader :thread
+    
     # Create new worker for some +evolution+. You must already create all tests
     # in Tests instance.
     def initialize(evolution)
       @evolution = evolution
       @tests = evolution.tests.dup
+    end
+    
+    # Iteration of worker job. Return true if worker need next interation to
+    # finish job.
+    def work
+      one = @evolution.old_population.pop
+      return unless one
+      two = one.clone
+      
+      one.mutate!
+      result = @tests.run(one)
+      @evolution.population.push(one, result)
+      
+      two.mutate!
+      result = @tests.run(two)
+      @evolution.population.push(two, result)
+    end
+    
+    # Run in new thread all iteration of worker +work+.
+    def run
+      @thread = Thread.new do
+        loop do
+          break unless work
+        end
+      end
     end
   end
 end

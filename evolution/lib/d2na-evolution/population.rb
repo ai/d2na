@@ -54,9 +54,11 @@ module D2NA
     # Remove and return last code. It is thread safe.
     def pop
       @mutex.synchronize do
+        return nil if @layers.empty?
         if @layers.last.empty?
           @layers.pop
           @results.pop
+          return nil if @layers.empty?
         end
         @layers.last.pop
       end

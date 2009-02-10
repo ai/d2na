@@ -12,9 +12,9 @@ describe D2NA::Evolution do
     end
     
     evolution.tests.tests.should == [[test, 'first', 2],
-                                     [test, 'second', nil],
+                                     [test, 'second', 1],
                                      [test, nil, 0.5],
-                                     [test, nil, nil]]
+                                     [test, nil, 1]]
   end
   
   it "should raise error on test without block" do
@@ -77,6 +77,25 @@ describe D2NA::Evolution do
     
     evolution.first_population.should == 5
     evolution.population.layers.should == [[code, code, code, code, code]]
+  end
+  
+  it "should create next population" do
+    code = D2NA::MutableCode.new
+    clone = D2NA::MutableCode.new
+    code.should_receive(:clone).exactly(2).and_return(clone)
+    code.should_receive(:mutate!).exactly(2)
+    clone.should_receive(:mutate!).exactly(2)
+    
+    evolution = D2NA::Evolution.new do
+      protocode code
+      first_population 2
+      selection do
+        should @code == clone
+      end
+    end
+    evolution.step!
+    
+    evolution.population.layers.should == [[code, code], [clone, clone]]
   end
   
 end
