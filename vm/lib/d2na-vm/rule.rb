@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Block of D²NA code.
 
@@ -68,7 +69,7 @@ module D2NA
     # Compile commands to Proc.
     def compile
       methods = Hash.new('').merge!(
-        { :send => 'send_out', :up => 'state_up', :down => 'state_down' })
+        { send: 'send_out', up: 'state_up', down: 'state_down' })
       @compiled = eval(
         @commands.inject('proc {') do |code, command|
           type, name = command

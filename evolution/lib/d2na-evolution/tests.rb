@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Group of tests for D²NA code.
 
@@ -73,7 +74,7 @@ module D2NA
     # and it count as value. You can also use key <tt>:priority</tt>.
     # To check order use +out+ property.
     #
-    #   out_should :A => 1, :B => 5, :priority => 2
+    #   out_should A: 1, B: 5, priority: 2
     def out_should(signals)
       priority = signals[:priority] || @current_priority
       signals.delete :priority
@@ -110,7 +111,7 @@ module D2NA
     # Match, that out doesn’t contain +signals+. You can also set
     # <tt>:priority</tt> with value in last argument.
     #
-    #   out_should_hasnt :A, :B, :priority => 2
+    #   out_should_hasnt :A, :B, priority: 2
     def out_should_hasnt(*signals)
       if Hash == signals.last.class and signals.last.has_key?(:priority)
         priority = signals.last[:priority]
@@ -128,7 +129,7 @@ module D2NA
     
     # Match that out is empty. +options+ may include <tt>:priority</tt>.
     #
-    #   out_should_be_empty :priority => 2
+    #   out_should_be_empty priority: 2
     def out_should_be_empty(options = {})
       priority = options[:priority] || @current_priority
       @result.match(@out.empty?, priority)
@@ -150,7 +151,7 @@ module D2NA
     # include <tt>:priority</tt>.
     #
     #   should array.empty?
-    #   should 2 == count, :priority => 2
+    #   should 2 == count, priority: 2
     def should(test, options = {})
       @result.match(test, options[:priority] || @current_priority)
     end
@@ -158,7 +159,7 @@ module D2NA
     # Shortcut for <tt>result.min</tt> to add +value+ that should be min.
     # +options+ may include <tt>:priority</tt>.
     #
-    #   min errors, :priority => 2
+    #   min errors, priority: 2
     def min(value, options = {})
       @result.min(value, options[:priority] || @current_priority)
     end
@@ -166,7 +167,7 @@ module D2NA
     # Shortcut for <tt>result.max</tt> to add +value+ that should be max.
     # +options+ may include <tt>:priority</tt>.
     #
-    #   max count, :priority => 2
+    #   max count, priority: 2
     def max(value, options = {})
       @result.max(value, options[:priority] || @current_priority)
     end

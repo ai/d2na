@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Record output signals from D²NA code.
 

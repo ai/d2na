@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Control evolution for D²NA code.
 
@@ -95,7 +96,7 @@ module D2NA
         end
       else
         unless protocode.kind_of? MutableCode
-          %w{<< listen mutate!}.each do |method|
+          [:<<, :listen, :mutate!].each do |method|
             unless protocode.methods.include? method
               raise ArgumentError, "User protocode didn't has #{method} method"
             end
@@ -148,9 +149,9 @@ module D2NA
     # First argument is test description, like in RSpec. In second you can set
     # <tt>:priority</tt> with value. In block you can use:
     # * <tt>send :Signal</tt> to send signal to testing code;
-    # * <tt>out_should :Signal => count</tt> to match all sent output signals
+    # * <tt>out_should Signal: count</tt> to match all sent output signals
     #   counts;
-    # * <tt>out_should_has :Signal => count</tt> to match only selected output
+    # * <tt>out_should_has Signal: count</tt> to match only selected output
     #   signals;
     # * <tt>out_should_hasnt :Signal</tt> to match that this output signals
     #   isn’t be sent.
@@ -166,16 +167,16 @@ module D2NA
     #
     # Usage:
     # 
-    #   selection "example test", :priority => 2 do
+    #   selection "example test", priority: 2 do
     #     out_should_be_empty
     #     send :A, :A, :B
-    #     out_should_has :A => 2, :B => 1
-    #     out_should_has :B => 1
+    #     out_should_has A: 2, B: 1
+    #     out_should_has B: 1
     #     clear_out
     #     send :A
-    #     out_should_hasnt :B, :priority => 4
+    #     out_should_hasnt :B, priority: 4
     #     should out.length == 1
-    #     min code.length, :priority => 0.5
+    #     min code.length, priority: 0.5
     #   end
     def selection(description = nil, options = {}, &block)
       raise ArgumentError, 'Test must have block with code' unless block_given?

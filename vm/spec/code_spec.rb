@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe D2NA::Code do
@@ -78,12 +79,12 @@ describe D2NA::Code do
     end
     
     code.conditions_cache.should == {
-      :Init  => [],
-      :Big   => [],
-      :Small => [code.rules.first],
-      :one   => [code.rules.first],
-      :two   => [code.rules.first],
-      :three => []
+      Init:  [],
+      Big:   [],
+      Small: [code.rules.first],
+      one:   [code.rules.first],
+      two:   [code.rules.first],
+      three: []
     }
   end
   
@@ -111,7 +112,7 @@ describe D2NA::Code do
         send :Output
       end
     end
-    mock = mock('listener', :dispatch => true)
+    mock = mock('listener', dispatch: true)
     code.listen &mock.method(:dispatch)
     
     code.delete_listeners!

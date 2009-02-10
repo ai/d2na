@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Test result for D²NA code.
 

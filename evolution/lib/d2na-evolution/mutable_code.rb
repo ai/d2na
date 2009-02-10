@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Extend D²NA Code to evolution: modify, mutate and print as Ruby core.
 
@@ -17,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'rubygems'
 require 'faker'
 require 'set'
 
@@ -43,10 +43,10 @@ module D2NA
       @conditions_permutations = [Set[]]
       @commands = []
       @mutation_params = {
-        :min_actions => 1,       :max_actions => 3,
-        :min_state_actions => 3, :max_state_actions => 9,
-        :add => 0.5,             :remove => 0.3,
-        :add_state => 0.15,       :remove_state => 0.05
+        min_actions: 1,       max_actions: 3,
+        min_state_actions: 3, max_state_actions: 9,
+        add: 0.5,             remove: 0.3,
+        add_state: 0.15,      remove_state: 0.05
       }
       super(&block)
     end

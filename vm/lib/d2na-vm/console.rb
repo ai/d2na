@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Run D²NA code in console.
 

@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe D2NA::Evolution do
@@ -5,9 +6,9 @@ describe D2NA::Evolution do
   it "should create tests" do
     test = lambda {}
     evolution = D2NA::Evolution.new do
-      selection 'first', :priority => 2, &test
+      selection 'first', priority: 2, &test
       selection 'second', &test
-      selection :priority => 0.5, &test
+      selection priority: 0.5, &test
       selection &test
     end
     
@@ -39,13 +40,13 @@ describe D2NA::Evolution do
   end
   
   it "should set user protocode" do
-    class MySuperCode
+    class ::MySuperCode
       def <<(signal); end
       def listen(*signlas, &block); end
       def mutate!; end
     end
     evolution = D2NA::Evolution.new do
-      protocode MySuperCode.new
+      protocode ::MySuperCode.new
     end
     
     evolution.protocode.class.should == MySuperCode

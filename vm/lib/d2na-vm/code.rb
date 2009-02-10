@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 D²NA code.
 

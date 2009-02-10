@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe D2NA::Rule do
@@ -17,7 +18,7 @@ describe D2NA::Rule do
   end
   
   it "should run commands on owner" do
-    code = mock('code', :null_object => true)
+    code = mock('code', null_object: true)
     
     code.should_receive(:state_up).with(:state).ordered
     code.should_receive(:send_out).with(:Output).ordered

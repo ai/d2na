@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe D2NA::MutableCode do
@@ -181,24 +182,24 @@ describe D2NA::MutableCode do
   end
   
   it "should mutate commands" do
-    @code.mutation_params.merge!(:add_state => 0, :remove_state => 0)
+    @code.mutation_params.merge!(add_state: 0, remove_state: 0)
     
-    @code.mutate!(:add => 1, :remove => 0, :min_actions => 3)
+    @code.mutate!(add: 1, remove: 0, min_actions: 3)
     @code.length.should == 6
     
-    @code.mutate!(:add => 0, :remove => 1, :max_actions => 1)
+    @code.mutate!(add: 0, remove: 1, max_actions: 1)
     @code.length.should == 5
   end
   
   it "should mutate states" do
-    @code.mutation_params.merge!(:add => 0, :remove => 0, :max_actions => 1)
+    @code.mutation_params.merge!(add: 0, remove: 0, max_actions: 1)
     
-    @code.mutate!(:add_state => 1, :remove_state => 0, :min_state_actions => 3)
+    @code.mutate!(add_state: 1, remove_state: 0, min_state_actions: 3)
     @code.should have(2).states
     @code.should have_at_least(1).rules
     @code.should have(5).commands
     
-    @code.mutate!(:add_state => 0, :remove_state => 1)
+    @code.mutate!(add_state: 0, remove_state: 1)
     @code.should have(1).states
   end
 end

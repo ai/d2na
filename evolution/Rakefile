@@ -1,6 +1,7 @@
-require 'rubygems'
+# encoding: utf-8
 require 'rake'
 require 'rake/rdoctask'
+gem 'rspec'
 require 'spec/rake/spectask'
 
 Spec::Rake::SpecTask.new('spec') do |t|

@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Population of D²NA codes.
 
@@ -80,21 +81,21 @@ module D2NA
       while lower + 1 != upper
         mid = ((lower + upper) / 2).to_i
         case result <=> @results[mid]
-        when  0:
+        when  0
           return mid
-        when  1:
+        when  1
           lower = mid
           answer = upper
-        when -1:
+        when -1
           upper = mid
           answer = lower
         end
       end
       
       case result <=> @results[answer]
-      when 0:
+      when 0
         return answer
-      when 1:
+      when 1
         answer += 1
       end
       @results.insert(answer, result)

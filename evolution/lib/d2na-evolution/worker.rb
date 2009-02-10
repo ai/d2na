@@ -1,3 +1,4 @@
+# encoding: utf-8
 =begin
 Evolution worker to work with D²NA code.
 

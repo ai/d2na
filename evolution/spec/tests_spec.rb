@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe D2NA::Tests do
@@ -56,9 +57,9 @@ describe D2NA::Tests do
   
   it "should has shortcuts with priority" do
     @tests.add do
-      should 1 == 1, :priority => 3
-      min 1, :priority => 3
-      max 10, :priority => 3
+      should 1 == 1, priority: 3
+      min 1, priority: 3
+      max 10, priority: 3
     end
     result = @tests.run(@code)
     
@@ -79,7 +80,7 @@ describe D2NA::Tests do
   it "should match all output signals count" do
     @tests.add do
       send :Input, :Input, :A
-      out_should :Output => 2, :priority => 3
+      out_should Output: 2, priority: 3
     end
     result = @tests.run(@code)
     
@@ -94,7 +95,7 @@ describe D2NA::Tests do
   it "should match some output signals count" do
     @tests.add do
       send :Input, :Input, :A
-      out_should_has :Output => 2, :priority => 2
+      out_should_has Output: 2, priority: 2
     end
     result = @tests.run(@code)
     
@@ -109,7 +110,7 @@ describe D2NA::Tests do
   it "should match, that out doesn't contain some signals" do
     @tests.add do
       send :A, :A
-      out_should_hasnt :Output, :B, :priority => 2
+      out_should_hasnt :Output, :B, priority: 2
       out_should_hasnt :B
     end
     result = @tests.run(@code)
@@ -124,7 +125,7 @@ describe D2NA::Tests do
   
   it "should match empty out" do
     @tests.add nil, 3 do
-      out_should_be_empty :priority => 2
+      out_should_be_empty priority: 2
       send :Input
       out_should_be_empty
     end

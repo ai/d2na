@@ -1,6 +1,7 @@
-require 'rubygems'
+# encoding: utf-8
 require 'rake'
 require 'rake/rdoctask'
+gem 'rspec'
 require 'spec/rake/spectask'
 
 Spec::Rake::SpecTask.new('spec') do |t|
@@ -18,7 +19,7 @@ end
 Rake::RDocTask.new do |rdoc|
   rdoc.main = 'README.rdoc'
   rdoc.rdoc_files.include('**/*.rdoc', '*/lib/**/*.rb')
-  rdoc.title = 'D²NA'
+  rdoc.title = 'D2NA'
   rdoc.rdoc_dir = 'doc'
   rdoc.options << '-c utf-8'
   rdoc.options << '--all'
