@@ -56,6 +56,7 @@ module D2NA
       @worker_count = 2
       @protocode = MutableCode.new
       @stagnation = 0
+      @end_checker = lambda { success }
       instance_eval(&block) if block_given?
       
       @workers = []
@@ -194,7 +195,43 @@ module D2NA
       @tests.add(description, options[:priority] || 1, &block)
     end
     
-    # Do next evolution iteration: clone, mutate and select population.
+    # Set conditions to end evolution iterations. You should use:
+    # * +success+ to check is a best result in current population match all
+    #   boolean tests;
+    # * <tt>stagnation == _count_</tt> to check evolution stagnation – count of
+    #   iteration without new result.
+    # 
+    # Check success if there is a specific necessary result. For example, if
+    # you generate summator and code must send exactly 5 +C+ signals, if it
+    # receive 3 +A+ and 2 +B+.
+    # 
+    #   end_if { success }
+    #
+    # Check stagnation if there isn’t specific result – test must have most
+    # minimum or maximum result of the possible. For example, if code size
+    # must be minimum. Big stagnation length require more time to generate.
+    # Small length can miss better result.
+    # 
+    #   end_if { stagnation == 100 }
+    #
+    # It is useful to use both checkers:
+    # 
+    #   end_if { success and stagnation == 100 }
+    #
+    # If you has optional boolean test, but didn’t know is it possible, use
+    # +or+ group:
+    # 
+    #   end_if { success or stagnation == 100 }
+    def end_if(&checker)
+      @end_checker = checker if block_given?
+    end
+    
+    # Do next evolution iteration: clone, mutate and select population. Use
+    # +end_if+ to set end conditions and +end?+ to check it.
+    # 
+    #   while evolution.end?
+    #     evolution.step!
+    #   end
     def step!
       @old_population = @population
       @last_best_result = @old_population.best_result
@@ -208,6 +245,22 @@ module D2NA
       else
         @stagnation = 0
       end
+    end
+    
+    # Return true on end conditions, which was set by +end_if+. Use in the
+    # loop with +step!+ call:
+    # 
+    #   while evolution.end?
+    #     evolution.step!
+    #   end
+    def end?
+      @end_checker.call
+    end
+    
+    # Alias for <tt>population.best_result.success?</tt> to use in +end_if+ as
+    # condition.
+    def success
+      @population.best_result.success?
     end
   end
 end

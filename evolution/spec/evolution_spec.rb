@@ -70,7 +70,7 @@ describe D2NA::Evolution do
   end
   
   it "should create first population" do
-    code = D2NA::MutableCode.new
+    code = fake_code
     evolution = D2NA::Evolution.new do
       protocode code
       first_population 5
@@ -100,9 +100,7 @@ describe D2NA::Evolution do
   end
   
   it "should calculate stagnation" do
-    code = D2NA::MutableCode.new
-    code.stub!(:clone).and_return(code)
-    code.stub!(:mutate!)
+    code = fake_code
     evolution = D2NA::Evolution.new do
       protocode code
       selection do
@@ -119,6 +117,35 @@ describe D2NA::Evolution do
     code.output :A
     evolution.step!
     evolution.stagnation.should == 0
+  end
+  
+  it "should end iterations by success" do
+    tests_success = false
+    evolution = D2NA::Evolution.new do
+      protocode fake_code
+      selection { should tests_success }
+      end_if { success }
+    end
+    
+    evolution.should_not be_end
+    
+    tests_success = true
+    evolution.step!
+    evolution.should be_end
+  end
+  
+  it "should end iterations by stagnation" do
+    evolution = D2NA::Evolution.new do
+      protocode fake_code
+      selection { should false }
+      end_if { stagnation == 5 }
+    end
+    
+    5.times do
+      evolution.should_not be_end
+      evolution.step!
+    end
+    evolution.should be_end
   end
   
 end
