@@ -141,7 +141,7 @@ describe D2NA::Tests do
   it "should clear out" do
     @tests.add do
       send :Input, :A
-      clear_out
+      clear_out!
     end
     @tests.run(@code)
     

@@ -137,7 +137,7 @@ describe D2NA::Evolution do
   it "should end iterations by stagnation" do
     evolution = D2NA::Evolution.new do
       protocode fake_code
-      selection { should false }
+      selection { should 1 == 0 }
       end_if { stagnation == 5 }
     end
     
@@ -146,6 +146,44 @@ describe D2NA::Evolution do
       evolution.step!
     end
     evolution.should be_end
+  end
+  
+  it "should return is next step is necessary" do
+    tests_success = false
+    evolution = D2NA::Evolution.new do
+      protocode fake_code
+      selection { should tests_success }
+      end_if { success and stagnation > 0 }
+    end
+    
+    evolution.next_step?.should be_true
+    evolution.step!
+    
+    evolution.next_step?.should be_true
+    tests_success = true
+    evolution.step!
+    
+    evolution.next_step?.should be_true
+    evolution.step!
+    
+    evolution.next_step?.should be_false
+  end
+  
+  it "should raise error on stagnation limit" do
+    evolution = D2NA::Evolution.new do
+      protocode fake_code
+      stagnation_limit 5
+      selection { should 1 == 0 }
+    end
+    
+    evolution.stagnation_limit.should == 5
+    5.times do
+      evolution.next_step?.should be_true
+      evolution.step!
+    end
+    lambda {
+      evolution.next_step?
+    }.should raise_error D2NA::Timeout, /5 steps/
   end
   
 end

@@ -24,17 +24,8 @@ module D2NA
     # Code tests, which will direct evolution.
     attr_reader :tests
     
-    # First version of code to start evolution.
-    attr_reader :protocode
-    
-    # Working count.
-    attr_reader :worker_count
-    
     # Array of workers.
     attr_reader :workers
-    
-    # First population size.
-    attr_reader :first_population
     
     # Population from previous step.
     attr_reader :old_population
@@ -57,6 +48,7 @@ module D2NA
       @protocode = MutableCode.new
       @stagnation = 0
       @end_checker = lambda { success }
+      @stagnation_limit = 1000
       instance_eval(&block) if block_given?
       
       @workers = []
@@ -96,13 +88,7 @@ module D2NA
     # 
     #   protocode MySuperDNA.new
     def protocode(protocode = nil, &block)
-      if protocode.nil?
-        if block_given?
-          @protocode.instance_eval(&block)
-        else
-          return @protocode
-        end
-      else
+      if protocode
         unless protocode.kind_of? MutableCode
           [:<<, :listen, :mutate!].each do |method|
             unless protocode.methods.include? method
@@ -111,13 +97,19 @@ module D2NA
           end
         end
         @protocode = protocode
+      else
+        if block_given?
+          @protocode.instance_eval(&block)
+        else
+          return @protocode
+        end
       end
     end
     
     # Set workers count. If you didn’t set argument it return current count.
     # You can use it only in constructor block.
     #
-    # Workers do parallel tasts in separated threads for performance on
+    # Workers do parallel tasks in separated threads for performance on
     # multicore processors. You should set as many workers, as you have CPU
     # cores.
     #
@@ -125,10 +117,10 @@ module D2NA
     #
     #   worker_count 4
     def worker_count(count = nil)
-      if count.nil?
-        @worker_count
-      else
+      if count
         @worker_count = count
+      else
+        @worker_count
       end
     end
     
@@ -137,14 +129,14 @@ module D2NA
     # 
     # First population will be contain only clone of protocode without any
     # changes. This parameter influence only in first steps, so there is
-    # no reason to change it in standart project.
+    # no reason to change it in standard project.
     #
     #   first_population 10
     def first_population(count = nil)
-      if count.nil?
-        @first_population
-      else
+      if count
         @first_population = count
+      else
+        @first_population
       end
     end
     
@@ -164,7 +156,7 @@ module D2NA
     # * <tt>out_should_hasnt :Signal</tt> to match that this output signals
     #   isn’t be sent.
     # * <tt>out_should_be_empty</tt> to match, that out is empty;
-    # * <tt>clear_out</tt> to clear output signals queue for <tt>out_*</tt>
+    # * <tt>clear_out!</tt> to clear output signals queue for <tt>out_*</tt>
     #   matchers;
     # * <tt>should out.length == 5</tt> to match some boolean test;
     # * <tt>min value</tt> to select code, that has minimum value;
@@ -180,7 +172,7 @@ module D2NA
     #     send :A, :A, :B
     #     out_should_has A: 2, B: 1
     #     out_should_has B: 1
-    #     clear_out
+    #     clear_out!
     #     send :A
     #     out_should_hasnt :B, priority: 4
     #     should out.length == 1
@@ -195,10 +187,11 @@ module D2NA
       @tests.add(description, options[:priority] || 1, &block)
     end
     
-    # Set conditions to end evolution iterations. You should use:
+    # Set conditions to end evolution iterations. You can use it only in
+    # constructor block. You should use:
     # * +success+ to check is a best result in current population match all
     #   boolean tests;
-    # * <tt>stagnation == _count_</tt> to check evolution stagnation – count of
+    # * <tt>stagnation > _count_</tt> to check evolution stagnation – count of
     #   iteration without new result.
     # 
     # Check success if there is a specific necessary result. For example, if
@@ -212,24 +205,38 @@ module D2NA
     # must be minimum. Big stagnation length require more time to generate.
     # Small length can miss better result.
     # 
-    #   end_if { stagnation == 100 }
+    #   end_if { stagnation > 100 }
     #
     # It is useful to use both checkers:
     # 
-    #   end_if { success and stagnation == 100 }
+    #   end_if { success and stagnation > 100 }
     #
     # If you has optional boolean test, but didn’t know is it possible, use
     # +or+ group:
     # 
-    #   end_if { success or stagnation == 100 }
+    #   end_if { success or stagnation > 100 }
     def end_if(&checker)
       @end_checker = checker if block_given?
     end
     
+    # Set maximum stagnation (count of iteration without new result) after that
+    # evolution will think that it can’t find success code and stop generation.
+    # If you didn’t set argument it return current value.
+    #
+    #   stagnation_limit 1000
+    def stagnation_limit(maximum = nil)
+      if maximum
+        @stagnation_limit = maximum
+      else
+        @stagnation_limit
+      end
+    end
+    
     # Do next evolution iteration: clone, mutate and select population. Use
-    # +end_if+ to set end conditions and +end?+ to check it.
+    # +end_if+ to set end conditions, +stagnation_limit+ to set maximum
+    # stagnation and +next_step?+ to check them.
     # 
-    #   while evolution.end?
+    #   while evolution.next_step?
     #     evolution.step!
     #   end
     def step!
@@ -247,14 +254,29 @@ module D2NA
       end
     end
     
-    # Return true on end conditions, which was set by +end_if+. Use in the
-    # loop with +step!+ call:
+    # Return true on end conditions, which was set by +end_if+. Use +next_step?+
+    # to check +stagnation_limit+ too.
+    def end?
+      instance_eval &@end_checker
+    end
+    
+    # Return true if stagnation is more that maximum limit and evolution can’t
+    # generate success code. Use +stagnation_limit+ to set this limit. Use
+    # +next_step?+ to check end conditions too.
+    def no_result?
+      @stagnation_limit <= stagnation
+    end
+    
+    # Raise D2NA::Timeout error if evolution can’t generate success code
+    # (stagnation is more that maximum limit by +stagnation_limit+) or return
+    # true if end conditions (by +end_if+) aren’t satisfied.
     # 
-    #   while evolution.end?
+    #   while evolution.next_step?
     #     evolution.step!
     #   end
-    def end?
-      @end_checker.call
+    def next_step?
+      raise Timeout.new(@stagnation_limit) if no_result?
+      not end?
     end
     
     # Alias for <tt>population.best_result.success?</tt> to use in +end_if+ as

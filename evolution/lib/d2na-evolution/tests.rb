@@ -137,7 +137,7 @@ module D2NA
     end
     
     # Delete all recorded output signals.
-    def clear_out
+    def clear_out!
       @output_signals.clear
       @out.clear
     end

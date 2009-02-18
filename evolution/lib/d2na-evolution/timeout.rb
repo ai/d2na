@@ -1,8 +1,8 @@
 # encoding: utf-8
 =begin
-Main file to load all necessary classes for D²NA evolution.
+Timeout error on stagnation excess.
 
-Copyright (C) 2008 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
+Copyright (C) 2009 Andrey “A.I.” Sitnik <andrey@sitnik.ru>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,20 +18,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'pathname'
-dir = Pathname(__FILE__).dirname.expand_path + 'd2na-evolution'
-
-begin
-  require dir + '../../../vm/lib/d2na-vm'
-rescue LoadError
-  puts "Error: Can't load D2NA Virtual Machine"
-  exit
+module D2NA
+  # Raised by Evolution, when it can generate necessary code (stagnation is more
+  # that maximum limit by +stagnation_limit+).
+  class Timeout < RuntimeError
+    def initialize(stagnation_limit)
+      super("Evolution can't generate necessary code. " +
+            "There is no new result for #{stagnation_limit} steps.")
+    end
+  end
 end
-
-require dir + 'mutable_code'
-require dir + 'test_result'
-require dir + 'tests'
-require dir + 'population'
-require dir + 'worker'
-require dir + 'timeout'
-require dir + 'evolution'
