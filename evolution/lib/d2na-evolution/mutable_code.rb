@@ -18,7 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
-require 'faker'
 require 'set'
 
 module D2NA
@@ -42,6 +41,9 @@ module D2NA
       @unused_conditions = []
       @conditions_permutations = [Set[]]
       @commands = []
+      @modify_depth = 0
+      @generated_states = 0
+      
       @mutation_params = {
         min_actions: 1,       max_actions: 3,
         min_state_actions: 3, max_state_actions: 9,
@@ -127,11 +129,20 @@ module D2NA
     #     send :Output
     #   end
     def modify(&block)
-      @modified_rules = Set[]
-      self.instance_eval(&block)
-      @modified_rules.each do |rule|
-        rule.compile
+      @modify_depth += 1
+      
+      if 1 == @modify_depth
+        @modified_rules = Set[]
+        self.instance_eval(&block)
+        
+        @modified_rules.each do |rule|
+          rule.compile
+        end
+      else
+        self.instance_eval(&block)
       end
+      
+      @modify_depth -= 1
       self
     end
     
@@ -151,7 +162,6 @@ module D2NA
       modify do
         count.times do
           choice = sum * rand
-          
           if choice < p[:add]
             # Add command
             add_command rand(conditions_count),
@@ -159,13 +169,11 @@ module D2NA
             
           elsif choice < p[:add] + p[:remove]
             # Remove command
-            remove_command rand(length)
+            remove_command(rand(length))
             
           elsif choice < sum - p[:remove_state]
             # Add state
-            begin
-              state = Faker::Name.first_name.downcase.to_sym
-            end while @states.keys.include? state
+            state = new_state_name
             before_permutation = @conditions_permutations.length
             before_conditions = conditions_count
             before_commands = @commands.length
@@ -180,7 +188,7 @@ module D2NA
                           *@commands[rand(@commands.length)]
             end
             
-          else
+          elsif not @states.empty?
             # Remove state
             remove_state @states.keys[rand(@states.length)]
           end
@@ -206,6 +214,7 @@ module D2NA
       @unused_conditions << set
       @exists_conditions.delete(set)
       @rules.delete(rule)
+      @required.delete(rule)
       rule.conditions.each do |condition|
         @conditions_cache[condition].delete(rule)
       end
@@ -214,17 +223,23 @@ module D2NA
     
     # Delete state, all it’s commands and rules with it in conditions.
     def remove_state(state)
-      @conditions_cache[state].each do |rule|
+      @conditions_cache[state].clone.each do |rule|
         delete_rule(rule)
       end
       modify do
-        @rules.each_with_index do |rule, rule_number|
-          rule.commands.each_with_index do |command, command_number|
-            if state == command[1]
-              remove_command(command_number, rule_number)
-              break
+        rule_number = 0
+        while @rules.length - 1 >= rule_number
+          rule = @rules[rule_number]
+          command_number = 0
+          while rule.commands.length - 1 >= command_number
+            if state == rule.commands[command_number][1]
+              rule = remove_command(command_number, rule_number)
+              break unless rule
+            else
+              command_number += 1
             end
           end
+          rule_number += 1 if rule
         end
       end
       @conditions_cache.delete(state)
@@ -249,12 +264,27 @@ module D2NA
           another.instance_variable_set(name, value.dup)
         end
       end
+      another.instance_variable_get('@conditions_cache').each_pair do |i, value|
+        another.instance_variable_get('@conditions_cache')[i] = value.clone
+      end
       another.instance_variable_set('@rules', @rules.clone)
       another.instance_variable_set('@parent', self)
       another
     end
     
     protected
+    
+    # Get next new unused state name.
+    def new_state_name
+      @generated_states += 1
+      num = @generated_states - 1
+      name = ''
+      begin
+        name << ('a'.ord + num % 26).chr
+        num /= 26
+      end while 0 < num
+      name.to_sym
+    end
     
     # Add conditions as unused if it isn’t used in rules.
     def add_unused_conditions(conditions)
@@ -274,14 +304,27 @@ module D2NA
     def add_command(rule_number, command, param)
       output param if :send == command
       if @rules.length > rule_number
-        rule = @rules[rule_number].dup
-        @rules[rule_number] = rule
+        old = @rules[rule_number]
+        @modified_rules.delete(old)
+        @rules[rule_number] = rule = clone_rule(old)
       else
         rule = on(*@unused_conditions[rule_number - @rules.length].to_a)
       end
       rule.commands << [command, param]
       @modified_rules << rule
       @length += 1
+    end
+    
+    # Clone rule and change all necessary caches. Used in copy on write.
+    def clone_rule(rule)
+      clone = rule.dup
+      clone.commands = clone.commands.dup
+      @required[clone] = @required.delete(rule)
+      rule.conditions.each do |condition|
+        @conditions_cache[condition].delete(rule)
+        @conditions_cache[condition] << clone
+      end
+      clone
     end
     
     # Delete command in special +position+ of all code if +rule+ is +nil+ or
@@ -291,17 +334,18 @@ module D2NA
     def remove_command(position, rule_number = nil)
       if rule_number
         rule = @rules[rule_number]
+        @modified_rules.delete(rule)
         if 1 == rule.commands.length
           delete_rule(rule)
-          @modified_rules.delete(rule)
+          nil
         else
-          rule = rule.dup
+          rule = clone_rule(rule)
           @rules[rule_number] = rule
           rule.commands.delete_at(position)
           @modified_rules << rule
           @length -= 1
+          rule
         end
-        rule
       else
         before = 0
         @rules.each_with_index do |rule, i|

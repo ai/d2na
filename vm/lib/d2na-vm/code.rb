@@ -195,6 +195,7 @@ module D2NA
       return self unless @input_signals.include? signal
       
       check_signal_name(signal)
+      @diff = {}
       @conditions_cache[signal].each do |rule|
         rule.call(self) if 1 == @required[rule]
       end

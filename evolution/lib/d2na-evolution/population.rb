@@ -92,6 +92,9 @@ module D2NA
         end
       end
       
+      #TODO fix binary search to remove this hack
+      answer -= 1 if @results.length == answer
+      
       case result <=> @results[answer]
       when 0
         return answer

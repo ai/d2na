@@ -186,4 +186,25 @@ describe D2NA::Evolution do
     }.should raise_error D2NA::Timeout, /5 steps/
   end
   
+  it "should generate summator" do
+    evolution = D2NA::Evolution.new do
+      protocode do
+        input :A, :B
+        output :C
+      end
+      first_population 5
+      stagnation_limit 10
+      
+      selection do
+        out_should_be_empty
+        send :A, :A
+        out_should C: 2
+        send :B, :B, :B
+        out_should C: 5
+      end
+    end
+    
+    evolution.step! while evolution.next_step?
+  end
+  
 end

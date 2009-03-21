@@ -21,6 +21,5 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('**/*.rdoc', '*/lib/**/*.rb')
   rdoc.title = 'D2NA'
   rdoc.rdoc_dir = 'doc'
-  rdoc.options << '-c utf-8'
-  rdoc.options << '--all'
+  rdoc.options << '--charset utf-8' << '--all' << '--inline-source'
 end

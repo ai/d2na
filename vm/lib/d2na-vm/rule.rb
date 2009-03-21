@@ -34,7 +34,7 @@ module D2NA
     # Array of block commands (<tt>[:type, :name]</tt>). Type can be
     # <tt>:up</tt>, <tt>:down</tt> (increment/decrement state) or <tt>:send</tt>
     # (send output signal). Name should be state or output signal name.
-    attr_reader :commands
+    attr_accessor :commands
     
     # Create D²NA rule for +creator+ Code with special +conditions+. In block
     # you can call +up+, +down+ and +send+ methods to add commands.
@@ -43,7 +43,7 @@ module D2NA
       @commands = []
       @output = []
       @states = []
-        
+      
       if block_given?
         instance_eval(&block)
         compile
@@ -58,7 +58,8 @@ module D2NA
         creator.output(*@output)
         creator.add_states(*@states)
       end
-      @output = @states = nil
+      remove_instance_variable :@output
+      remove_instance_variable :@states
     end
     
     # Run commands on +owner+.

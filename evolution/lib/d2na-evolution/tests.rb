@@ -57,6 +57,7 @@ module D2NA
       @result = TestResult.new
       @tests.each do |test, description, priority|
         @current_priority = priority
+        @code.start
         instance_eval &test
         @code.reset!
       end
