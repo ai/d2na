@@ -96,7 +96,7 @@ describe D2NA::Evolution do
     end
     evolution.step!
     
-    evolution.population.layers.should == [[clone, clone], [code, code]]
+    evolution.population.layers.should == [[clone, clone], [code, code, code]]
   end
   
   it "should calculate stagnation" do

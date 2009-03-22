@@ -45,7 +45,7 @@ module D2NA
       @generated_states = 0
       
       @mutation_params = {
-        min_actions: 1,       max_actions: 3,
+        min_actions: 1,       max_actions: 2,
         min_state_actions: 3, max_state_actions: 9,
         add: 0.5,             remove: 0.3,
         add_state: 0.15,      remove_state: 0.05

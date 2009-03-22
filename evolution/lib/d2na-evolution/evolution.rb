@@ -294,6 +294,7 @@ module D2NA
       @old_population = @population
       @last_best_result = @old_population.best_result
       @population = Population.new
+      @population.push(@old_population.best, @old_population.best_result)
       
       @workers.each { |i| i.run }
       @workers.each { |i| i.thread.join }
