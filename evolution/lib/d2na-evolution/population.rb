@@ -67,7 +67,22 @@ module D2NA
     
     # Best test result from population.
     def best_result
-      @results.last
+      @results.first
+    end
+    
+    # Delete bad results. Maximum length of best layer with be +firts+. Every
+    # next layer will be less than +decrease+ times.
+    def trim(first, decrease)
+      layers_count = Math.log(first, decrease).floor + 1
+      @layers = @layers.take(layers_count)
+      @results = @results.take(layers_count)
+      
+      next_length = first
+      @layers.map! do |layer|
+        length = next_length
+        next_length = length / decrease
+        layer.take(length)
+      end
     end
     
     protected
@@ -80,7 +95,7 @@ module D2NA
       answer = 0
       while lower + 1 != upper
         mid = ((lower + upper) / 2).to_i
-        case result <=> @results[mid]
+        case @results[mid] <=> result
         when  0
           return mid
         when  1
@@ -95,7 +110,7 @@ module D2NA
       #TODO fix binary search to remove this hack
       answer -= 1 if @results.length == answer
       
-      case result <=> @results[answer]
+      case @results[answer] <=> result
       when 0
         return answer
       when 1

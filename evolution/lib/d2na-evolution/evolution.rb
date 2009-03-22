@@ -49,6 +49,9 @@ module D2NA
       @stagnation = 0
       @end_checker = lambda { success }
       @stagnation_limit = 1000
+      @min_population = 10
+      @stagnation_grow = 2
+      @layer_decrease = 2
       instance_eval(&block) if block_given?
       
       @workers = []
@@ -137,6 +140,54 @@ module D2NA
         @first_population = count
       else
         @first_population
+      end
+    end
+    
+    # Set maximum count of codes with best result on zero stagnation.
+    # If you didn’t set argument it return current value.
+    #
+    # First layer (with best result) in population will be has maximum length:
+    # <tt>min_population + (stagnation_grow * stagnation)</tt>. Next layer:
+    # <tt>previous_layer_length / layer_decrease</tt>.
+    #
+    #   min_population 10
+    def min_population(count = nil)
+      if count
+        @min_population = count
+      else
+        @min_population
+      end
+    end
+    
+    # Set the grow for first layer (with best result) on each stagnation.
+    # If you didn’t set argument it return current value.
+    #
+    # First layer (with best result) in population will be has maximum length:
+    # <tt>min_population + (stagnation_grow * stagnation)</tt>. Next layer:
+    # <tt>previous_layer_length / layer_decrease</tt>.
+    #
+    #   stagnation_grow 2
+    def stagnation_grow(count = nil)
+      if count
+        @stagnation_grow = count
+      else
+        @stagnation_grow
+      end
+    end
+    
+    # Set decrease for next layer. If you didn’t set argument it return current
+    # value.
+    #
+    # First layer (with best result) in population will be has maximum length:
+    # <tt>min_population + (stagnation_grow * stagnation)</tt>. Next layer:
+    # <tt>previous_layer_length / layer_decrease</tt>.
+    #
+    #   layer_decrease 2
+    def layer_decrease(count = nil)
+      if count
+        @layer_decrease = count
+      else
+        @layer_decrease
       end
     end
     
@@ -252,6 +303,9 @@ module D2NA
       else
         @stagnation = 0
       end
+      
+      first = (@min_population + (@stagnation_grow * @stagnation)).round
+      @population.trim(first, @layer_decrease)
     end
     
     # Return true on end conditions, which was set by +end_if+. Use +next_step?+

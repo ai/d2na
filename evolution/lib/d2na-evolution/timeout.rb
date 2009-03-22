@@ -24,7 +24,7 @@ module D2NA
   class Timeout < RuntimeError
     def initialize(stagnation_limit)
       super("Evolution can't generate necessary code. " +
-            "There is no new result for #{stagnation_limit} steps.")
+            "There is no new result after #{stagnation_limit} steps.")
     end
   end
 end

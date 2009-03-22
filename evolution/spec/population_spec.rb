@@ -22,8 +22,8 @@ describe D2NA::Population do
     population.push(1, 1.0)
     population.push(2, 2.0)
     
-    population.results.should == [1.0, 2.0, 3.0, 4.0]
-    population.layers.should == [[1, 1, 1], [2, 2], [3], [4]]
+    population.results.should == [4.0, 3.0, 2.0, 1.0]
+    population.layers.should == [[4], [3], [2, 2], [1, 1, 1]]
     
     population.best_result.should == 4.0
   end
@@ -35,10 +35,26 @@ describe D2NA::Population do
     population.push(3, 3.0)
     population.push(2, 2.0)
     
-    population.pop.should == 3
-    population.pop.should == 2
-    population.pop.should == 2
     population.pop.should == 1
+    population.pop.should == 2
+    population.pop.should == 2
+    population.pop.should == 3
+  end
+  
+  it "should trim population" do
+    population = D2NA::Population.new
+    population.push(1, 1.0)
+    population.push(2, 2.0)
+    population.push(2, 2.0)
+    population.push(3, 3.0)
+    population.push(3, 3.0)
+    population.push(3, 3.0)
+    population.push(4, 4.0)
+    population.push(4, 4.0)
+    population.push(4, 4.0)
+    
+    population.trim(4, 2)
+    population.layers.should == [[4, 4, 4], [3, 3], [2]]
   end
   
 end
