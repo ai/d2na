@@ -85,6 +85,11 @@ module D2NA
       end
     end
     
+    # Smaller code with best result.
+    def best
+      @layers.first.min(&:length)
+    end
+    
     protected
     
     # Find index for +result+ by binary search or insert new result.

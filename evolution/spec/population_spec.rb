@@ -24,8 +24,6 @@ describe D2NA::Population do
     
     population.results.should == [4.0, 3.0, 2.0, 1.0]
     population.layers.should == [[4], [3], [2, 2], [1, 1, 1]]
-    
-    population.best_result.should == 4.0
   end
   
   it "should pop last code" do
@@ -55,6 +53,17 @@ describe D2NA::Population do
     
     population.trim(4, 2)
     population.layers.should == [[4, 4, 4], [3, 3], [2]]
+  end
+  
+  it "should return best value" do
+    population = D2NA::Population.new
+    population.push('12',   2.0)
+    population.push('123',  2.0)
+    population.push('1234', 2.0)
+    population.push('1', 1.0)
+    
+    population.best_result.should == 2.0
+    population.best.should == '12'
   end
   
 end
