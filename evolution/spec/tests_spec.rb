@@ -149,4 +149,18 @@ describe D2NA::Tests do
     @tests.output_signals.should be_empty
   end
   
+  it "should start code before test" do
+    @code = D2NA::Code.new do
+      on :Init do
+        send :Output
+      end
+    end
+    @tests.add do
+      out_should Output: 1
+    end
+    result = @tests.run(@code)
+    
+    result.should be_success
+  end
+  
 end

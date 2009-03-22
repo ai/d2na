@@ -47,8 +47,8 @@ module D2NA
       @mutation_params = {
         min_actions: 1,       max_actions: 2,
         min_state_actions: 3, max_state_actions: 9,
-        add: 0.5,             remove: 0.3,
-        add_state: 0.15,      remove_state: 0.05
+        add: 0.5,             remove: 0.1,
+        add_state: 0.05,      remove_state: 0.01
       }
       super(&block)
     end
@@ -255,24 +255,41 @@ module D2NA
       @rules.length + unused_conditions.length
     end
     
-    # Clone object with all instance variables without rules.
+    # Clone object with all instance variables extend rules.
     def clone
-      another = super
-      (instance_variables - ['@rules']).each do |name|
-        value = instance_variable_get(name)
-        if value.kind_of? Enumerable
-          another.instance_variable_set(name, value.dup)
-        end
+      clone = super
+      instance_variables.each do |name|
+        clone.instance_variable_set(name,
+            deep_clone(clone.instance_variable_get(name)))
       end
-      another.instance_variable_get('@conditions_cache').each_pair do |i, value|
-        another.instance_variable_get('@conditions_cache')[i] = value.clone
-      end
-      another.instance_variable_set('@rules', @rules.clone)
-      another.instance_variable_set('@parent', self)
-      another
+      clone.instance_variable_set(:@parent, self)
+      clone
     end
     
     protected
+    
+    # Clone +obj+ and all object inside it extend Rule and Code instances.
+    def deep_clone(obj)
+      case obj
+        when Fixnum, Bignum, Float, NilClass, FalseClass, TrueClass, Symbol,
+             Rule, Code
+          return obj
+        when Hash
+          clone = obj.clone
+          obj.each { |key, value| clone[key] = deep_clone(value) }
+        when Array
+          clone = obj.clone
+          clone.clear
+          obj.each{ |value| clone << deep_clone(value) }
+        else
+          clone = obj.clone
+      end
+      clone.instance_variables.each do |name|
+        clone.instance_variable_set(name,
+            deep_clone(clone.instance_variable_get(name)))
+      end
+      clone
+    end
     
     # Get next new unused state name.
     def new_state_name
