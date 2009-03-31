@@ -42,7 +42,9 @@ describe D2NA::Evolution do
   it "should set user protocode" do
     class ::MySuperCode
       def <<(signal); end
+      def reset!; end
       def listen(*signlas, &block); end
+      def delete_listeners!; end
       def mutate!; end
     end
     evolution = D2NA::Evolution.new do

@@ -61,6 +61,8 @@ module D2NA
         instance_eval &test
         @code.reset!
       end
+      
+      @code.delete_listeners!
       @result
     end
   

@@ -76,7 +76,9 @@ module D2NA
     # First version must be instance of MutableCode, not simple Code. But you
     # can use any another object, that has methods:
     # * <tt><< signal</tt> to send input signal;
+    # * <tt>reset!</tt> to clean all internal states;
     # * <tt>listen(*signals, &block)</tt> to add output signals listeners;
+    # * <tt>delete_listeners!</tt> to remove all output signals listeners;
     # * <tt>mutate!</tt> to add random changes.
     #
     # Usage:
@@ -92,7 +94,7 @@ module D2NA
     def protocode(protocode = nil, &block)
       if protocode
         unless protocode.kind_of? MutableCode
-          [:<<, :listen, :mutate!].each do |method|
+          [:<<, :reset!, :listen, :delete_listeners!, :mutate!].each do |method|
             unless protocode.methods.include? method
               raise ArgumentError, "User protocode didn't has #{method} method"
             end
