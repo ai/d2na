@@ -43,7 +43,6 @@ module D2NA
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
-      @first_population = 10
       @worker_count = 2
       @protocode = MutableCode.new
       @stagnation = 0
@@ -59,7 +58,7 @@ module D2NA
         @workers << Worker.new(self)
       end
       
-      @population = D2NA::Population.new(@first_population,
+      @population = D2NA::Population.new(@min_population,
                                          @protocode, @tests.run(@protocode))
     end
     
@@ -124,22 +123,6 @@ module D2NA
         @worker_count = count
       else
         @worker_count
-      end
-    end
-    
-    # Set first population size. If you didn’t set argument it return current
-    # value. You can use it only in constructor block.
-    # 
-    # First population will be contain only clone of protocode without any
-    # changes. This parameter influence only in first steps, so there is
-    # no reason to change it in standard project.
-    #
-    #   first_population 10
-    def first_population(count = nil)
-      if count
-        @first_population = count
-      else
-        @first_population
       end
     end
     

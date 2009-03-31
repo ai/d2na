@@ -73,10 +73,10 @@ describe D2NA::Evolution do
     code = fake_code
     evolution = D2NA::Evolution.new do
       protocode code
-      first_population 5
+      min_population 5
     end
     
-    evolution.first_population.should == 5
+    evolution.min_population.should == 5
     evolution.population.layers.should == [[code, code, code, code, code]]
   end
   
@@ -89,14 +89,14 @@ describe D2NA::Evolution do
     
     evolution = D2NA::Evolution.new do
       protocode code
-      first_population 2
+      min_population 2
       selection do
         should @code == clone
       end
     end
     evolution.step!
     
-    evolution.population.layers.should == [[clone, clone], [code, code, code]]
+    evolution.population.layers.should == [[clone, clone], [code]]
   end
   
   it "should calculate stagnation" do
@@ -192,7 +192,6 @@ describe D2NA::Evolution do
         input :A, :B
         output :C
       end
-      first_population 5
       stagnation_limit 10
       
       selection do
