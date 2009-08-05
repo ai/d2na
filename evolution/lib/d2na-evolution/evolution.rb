@@ -43,7 +43,7 @@ module D2NA
     # on new instance.
     def initialize(&block)
       @tests = Tests.new
-      @worker_count = 2
+      @worker_count = 1
       @protocode = MutableCode.new
       @stagnation = 0
       @end_checker = lambda { success }
@@ -110,6 +110,8 @@ module D2NA
       end
     end
     
+    # WARNING: Separated threads is under development and has bugs.
+    #
     # Set workers count. If you didn’t set argument it return current count.
     # You can use it only in constructor block.
     #
