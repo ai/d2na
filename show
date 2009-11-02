@@ -1,0 +1,3 @@
+#!/bin/bash
+
+pdflatex Отчёт.tex && evince Отчёт.pdf
