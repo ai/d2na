@@ -276,17 +276,15 @@ module D2NA
           return obj
         when Hash
           clone = obj.clone
-          obj.each { |key, value| clone[key] = deep_clone(value) }
+          obj.each { |key, value| clone[deep_clone(key)] = deep_clone(value) }
         when Array
-          clone = obj.clone
-          clone.clear
-          obj.each{ |value| clone << deep_clone(value) }
+          clone = obj.clone.map { |i| deep_clone(i) }
         else
           clone = obj.clone
-      end
-      clone.instance_variables.each do |name|
-        clone.instance_variable_set(name,
-            deep_clone(clone.instance_variable_get(name)))
+          clone.instance_variables.each do |name|
+            clone.instance_variable_set(name,
+                deep_clone(clone.instance_variable_get(name)))
+          end
       end
       clone
     end
