@@ -333,7 +333,7 @@ module D2NA
     # Clone rule and change all necessary caches. Used in copy on write.
     def clone_rule(rule)
       clone = rule.dup
-      clone.commands = clone.commands.dup
+      clone.commands = deep_clone(clone.commands)
       @required[clone] = @required.delete(rule)
       rule.conditions.each do |condition|
         @conditions_cache[condition].delete(rule)
