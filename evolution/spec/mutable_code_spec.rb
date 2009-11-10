@@ -119,7 +119,6 @@ describe D2NA::MutableCode do
     another_out = D2NA::Recorder.new(another)
     
     another.should_not equal(code)
-    another.parent.should equal(code)
     
     code << :Input
     another << :Input

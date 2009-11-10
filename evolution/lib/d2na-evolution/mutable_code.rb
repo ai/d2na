@@ -26,9 +26,6 @@ module D2NA
     # Conditions without rules.
     attr_reader :unused_conditions
     
-    # Code, which be cloned to this one.
-    attr_reader :parent
-    
     # Default mutation parameters. See +mutate+ for key description.
     attr_reader :mutation_params
     
@@ -262,7 +259,6 @@ module D2NA
         clone.instance_variable_set(name,
             deep_clone(clone.instance_variable_get(name)))
       end
-      clone.instance_variable_set(:@parent, self)
       clone
     end
     

@@ -85,7 +85,7 @@ describe D2NA::Evolution do
   it "should create next population" do
     code = D2NA::MutableCode.new
     clone = D2NA::MutableCode.new
-    code.should_receive(:clone).exactly(2).and_return(clone)
+    code.should_receive(:clone).exactly(4).and_return(clone)
     code.should_receive(:mutate!).exactly(0)
     clone.should_receive(:mutate!).exactly(4)
     
