@@ -43,6 +43,7 @@ module D2NA
       one = @evolution.old_population.pop
       return unless one
       two = one.clone
+      one = one.clone
       
       one.mutate!
       result = @tests.run(one)

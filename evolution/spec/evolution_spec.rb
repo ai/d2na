@@ -86,8 +86,8 @@ describe D2NA::Evolution do
     code = D2NA::MutableCode.new
     clone = D2NA::MutableCode.new
     code.should_receive(:clone).exactly(2).and_return(clone)
-    code.should_receive(:mutate!).exactly(2)
-    clone.should_receive(:mutate!).exactly(2)
+    code.should_receive(:mutate!).exactly(0)
+    clone.should_receive(:mutate!).exactly(4)
     
     evolution = D2NA::Evolution.new do
       protocode code
