@@ -28,12 +28,10 @@ evolution = D2NA::Evolution.new do
   
   opponents.each do |name, opponent|
     selection name do
-      
       our_punishment = 0
-      opponent_punishment = 0
       opponent_choice = nil
       
-      5.times do |i|
+      5.times do
         clear_out!
         send :Step
         our_choice = out.first
@@ -43,12 +41,10 @@ evolution = D2NA::Evolution.new do
           break
         end
         
-        opponent_choice = opponent.call(i, input_name(our_choice))
+        opponent_choice = opponent.call
         send input_name(opponent_choice)
         
-        our_time, opponent_time = punishments[[our_choice, opponent_choice]]
-        our_punishment += our_time
-        opponent_punishment += opponent_punishment
+        our_punishment += punishments[[our_choice, opponent_choice]].first
       end
       
       min our_punishment
