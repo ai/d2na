@@ -82,6 +82,16 @@ describe D2NA::Evolution do
     evolution.population.layers.should == [[code, code, code, code, code]]
   end
   
+  it "should return step count" do
+    evolution = D2NA::Evolution.new do
+      protocode fake_code
+    end
+    
+    evolution.step.should == 0
+    evolution.step!
+    evolution.step.should == 1
+  end
+  
   it "should create next population" do
     code = D2NA::MutableCode.new
     clone = D2NA::MutableCode.new

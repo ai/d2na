@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 module D2NA
   # Evolution controller.
   class Evolution
+    # Count of finished steps.
+    attr_reader :step
+    
     # Code tests, which will direct evolution.
     attr_reader :tests
     
@@ -42,6 +45,7 @@ module D2NA
     # Create new evolution. You can configure it in block, which will be eval
     # on new instance.
     def initialize(&block)
+      @step = 0
       @tests = Tests.new
       @worker_count = 1
       @protocode = MutableCode.new
@@ -294,6 +298,7 @@ module D2NA
       
       first = (@min_population + (@stagnation_grow * @stagnation)).round
       @population.trim(first, @layer_decrease)
+      @step += 1
     end
     
     # Return true on end conditions, which was set by +end_if+. Use +next_step?+
