@@ -10,8 +10,8 @@ punishments = {
 }
 
 opponents = {
-  good:     proc { :Keep },
-  bad:      proc { :Betray }
+  good: proc { :Keep },
+  bad:  proc { :Betray }
 }
 
 def input_name(output)
@@ -57,6 +57,5 @@ while evolution.next_step?
   putc '.'
 end
 
-puts
-puts
+puts "\n"
 puts evolution.population.best.to_ruby

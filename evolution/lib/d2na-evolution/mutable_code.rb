@@ -171,7 +171,6 @@ module D2NA
           elsif choice < sum - p[:remove_state]
             # Add state
             state = new_state_name
-            before_permutation = @conditions_permutations.length
             before_conditions = conditions_count
             before_commands = @commands.length
             add_states(state)
@@ -319,7 +318,9 @@ module D2NA
         @modified_rules.delete(old)
         @rules[rule_number] = rule = clone_rule(old)
       else
-        rule = on(*@unused_conditions[rule_number - @rules.length].to_a)
+        condition = @unused_conditions[rule_number - @rules.length]
+        return unless condition
+        rule = on(*condition.to_a)
       end
       rule.commands << [command, param]
       @modified_rules << rule
