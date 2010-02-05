@@ -1,7 +1,7 @@
 #!/bin/sh
 
 while true; do
+    pdflatex Аннотация.tex && pdflatex Диплом.tex
     inotifywait -e MOVE_SELF,MODIFY,CLOSE_WRITE *.tex
     sleep 1
-    . ./show
 done

@@ -1,3 +1,0 @@
-#!/bin/sh
-
-pdflatex Отчёт.tex && gnome-open Отчёт.pdf
