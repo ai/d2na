@@ -1,13 +1,7 @@
-\documentclass[russian,utf8]{eskdtext}
+\documentclass[utf8,a5paper,portrait,12pt]{eskdtext}
 \usepackage{eskdplain}
 
 \setcounter{tocdepth}{2}
-
-\usepackage{geometry}
-\geometry{left=3cm}
-\geometry{right=2cm}
-\geometry{top=2cm}
-\geometry{bottom=2cm}
 
 \begin{document}
 
@@ -70,6 +64,7 @@
         затрудненна, например, в космосе.
 \end{itemize}
 
+\newpage
 \section{Постановка задачи}
 Разработчик формулирует требование к алгоритму $a$ в виде оценочной
 функции $T$, так чтобы более подходящий для задачи алгоритм давал больший
@@ -85,6 +80,7 @@
 что важно, чтобы итоговый алгоритм был понятен человеку и весь процесс его
 генерации можно было наглядно представить и проанализировать.
 
+\newpage
 \section{Генетические алгоритмы}
 
 Как мы видим, задача сводится к оптимизации функции $T(a)$. Однако характер этой
@@ -176,6 +172,7 @@ $x_{ij}$ соответствует весу связи от нейрона $i$ 
         работа с графикой сложнее, чем с обычным текстом.
 \end{itemize}
 
+\newpage
 \section{Обзор языка $D^2NA$}
 
 \subsection{Анализ}
@@ -324,6 +321,7 @@ end
 и к нему легко применять множество инструментов для анализа текста (например,
 смотреть различия с помощью UNIX-программы \texttt{diff}).
 
+\newpage
 \section{Архитектура генератора}
 
 Инструментарий для $D^2NA$ состоит из двух пакетов:
@@ -521,6 +519,7 @@ code << :Input
 out #=> [:Output, :Output]
 \end{verbatim}
 
+\newpage
 \section{Программная реализация}
 
 \subsection{Средства разработки}
@@ -646,7 +645,9 @@ Ruby является мультипарадигменным языком: он 
 \begin{verbatim}
   class Array
     def at_rand
-      @not_picked = self.sort_by { rand } if @not_picked.empty?
+      if @not_picked.empty?
+        @not_picked = self.sort_by { rand }
+      end
       @not_picked.pop
     end
   end  
@@ -673,6 +674,7 @@ module DerivativeFunctions
 end
 \end{verbatim}
 
+\newpage
 \subsubsection{Синтаксис}
 
 Ruby выделяет тем, что обладает довольно гибким синтаксисом:
@@ -719,6 +721,7 @@ end
   \item Кодов, который печатает 1 (\texttt{puts 1}).
 \end{itemize}
 
+\newpage
 \subsection{Анализ $D^2NA$}
 
 В итоге, как можно заметить, синтаксис $D^2NA$ — это просто подсинтаксис
