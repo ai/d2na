@@ -429,6 +429,98 @@ IO.popen('d2na-vm ping-pong.d2na') do |io|
 end
 \end{verbatim}
 
+\subsubsection{Библиотека интерпретации}
+
+Хоть программа-интерпретатор и позволяет работать с $D^2NA$-кодом и человеку,
+и любой другой программе, но запуск отдельного процесса и взаимодействие с ним
+через канал (\texttt{pipe}) — не самый эффективный способ. Тем более, если
+$D^2NA$-код должен быть запущен из приложения на языке программирования Ruby,
+то интерпретатор загрузит ещё одну виртуальную машину Ruby, что не имеет смысла.
+
+Поскольку при генератор будет очень часто запускать $D^2NA$-код, то было решено
+сделать более быстрый способ запуска $D^2NA$-программ из приложений на языке
+программирования Ruby.
+
+Для этого был сделан Ruby-класс \texttt{D2NA::Code} с методами:
+\begin{itemize}
+  \item \texttt{new(\&block)} — загружает $D2NA$-код переданный в переменной
+        \texttt{block}.
+  \item \texttt{{<}< singal} — послать входящий сигнал из переменной
+        \texttt{signal}.
+  \item \texttt{listen(*singals, \&block)} — код в переменной \texttt{block} будет
+        вызван, когда загруженный код пошлёт исходящий сигнал, содержащийся в
+        массиве \texttt{singals}. Если массив \texttt{singals} пустой, то код из
+        \texttt{block} будет вызываться при любом исходящем сигнале.
+  \item \texttt{delete\_listeners!} — удаляет все коды, добавленные через метод
+        \texttt{listen}.
+  \item \texttt{reset!} — обнуляет все переменные загруженного кода
+        (переводит его в начальное состояние) и удаляет все коды, добавленные
+        через метод \texttt{listen}.
+\end{itemize}
+
+При получении первого входящего сигнала библиотека сама отправит загруженному
+коду стартовый сигнал \texttt{:Init}. После вызова метода \texttt{reset!} и
+обнуления переменных стартовый сигнал \texttt{:Init} будет снова послан
+автоматически.
+
+Пример работы с библиотекой:
+\begin{verbatim}
+require 'd2na/vm'
+
+code = D2NA::Code.new do
+  on :Init do
+    up :ping
+  end
+
+  on :Print, :ping do
+    send :Ping
+    down :ping
+    up :pong
+  end
+
+  on :Print, :pong do
+    send :Pong
+    down :pong
+    up :ping
+  end
+end
+
+code.listen { |signal| puts signal }
+
+code << :Print # Выведет Ping
+code << :Print # Выведет Pong
+code << :Print # Выведет Ping
+
+code.reset!
+code.listen { |signal| puts signal }
+code << :Print # Выведет Ping
+\end{verbatim}
+
+Очень часто программа работающая с $D^2NA$-кодом должна просто складывать
+исходящие сигналы в массив. Поэтому в библиотеке есть специальный класс
+\texttt{D2NA::Recorder} для этого. Он расширяет класс массива \texttt{Array},
+но позволяет в конструкторе передать код, сигналы с которого он будет
+записывать:
+\begin{verbatim}
+require 'd2na/vm'
+
+code = D2NA::Code.new do
+  on :Input do
+    up :a
+  end
+  on :Inpit, :a do
+    send :Output
+  end
+end
+
+out = D2NA::Recorder.new(code)
+
+code << :Input
+code << :Input
+code << :Input
+out #=> [:Output, :Output]
+\end{verbatim}
+
 \section{Программная реализация}
 
 \subsection{Средства разработки}
@@ -666,8 +758,6 @@ end;
         Symbol-строки «Input» и «var» и код, который вызывает метод
         \texttt{send} с параметром «Output» и \texttt{down} с параметром «var».
 \end{enumerate}
-
-  
 
 \newpage
 \begin{thebibliography}{}
