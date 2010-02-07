@@ -2,7 +2,7 @@
 
 while true; do
     rm images/*.tex
-    for i in images/*; do
+    for i in images/*.dia; do
         dia -t tex $i -e images/`basename $i .dia`.tex
     done
     pdflatex Аннотация.tex && pdflatex Диплом.tex
