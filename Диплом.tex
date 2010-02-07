@@ -688,8 +688,9 @@ end
         $D^2NA$-кода для сохранения в файл.
 \end{itemize}
 
-Возможные команды изменения $D^2NA$-кода, которые можно использовать
-внутри \texttt{modify}:
+Поскольку, каждое изменение $D^2NA$-кода требует ресурсов на компилияцию и
+пересоздание кешей, то несколько изменений можно объединить в один блок, передав
+их методу \texttt{modify}. Возможные команды изменения программы:
 \begin{itemize}
   \item \texttt{add\_command(rule, command, param)} — вставляет в
         правило с номером \texttt{rule} команду с именем
@@ -703,6 +704,21 @@ end
   \item \texttt{remove\_state(name)} — удаляет из кода переменную с именем,
         указанным в \texttt{name}, и все команды связанные с ней.
 \end{itemize}
+
+В итоге, измение загруженного $D^2NA$-код будет выглядеть как:
+\begin{verbatim}
+code = D2NA::Code.new do
+  on :Input do
+    up :a
+    send :Wrong
+  end
+end
+
+code.modify do
+  remove_command 2
+  add_command 1, :send, :Right
+end
+\end{verbatim}
 
 Параметры доступные в свойстве объекта \texttt{mutation\_params} для управления
 случайными изменениями в программе:
