@@ -7,7 +7,7 @@ while true; do
     done
     pdflatex Аннотация.tex && pdflatex Диплом.tex
     
-    rm *.log *.aux *.out images/*.tex
+    rm *.log *.aux images/*.tex
     
     inotifywait -e MOVE_SELF,MODIFY,CLOSE_WRITE *.tex images/*.dia
     sleep 1
