@@ -7,9 +7,33 @@
 \usepackage{pstricks}
 \usepackage{tikz}
 
+\renewcommand{\ESKDtitleFontI}{\ESKDfontIIsize}
+\renewcommand{\ESKDtitleFontIV}{\fontsize{14pt}{14pt}}
+\renewcommand{\ESKDtitleFontVIII}{\fontsize{12pt}{12pt}}
+\renewcommand{\ESKDtitleFontX}{\ESKDfontIII\upshape}
+
 \setcounter{tocdepth}{2}
 
 \begin{document}
+
+\ESKDdepartment{Санкт-Петербургский Государственный Политехнический
+                Университет}
+\ESKDcompany{Факультет Технической Кибернетики}
+
+\ESKDtitle{Дипломная работа}
+\ESKDdocName{Тема «Использование генетических алгоритмов
+для автоматизированного написания программ»}
+
+\renewcommand{\ESKDtheTitleFieldVIII}{
+\begin{flushleft}
+Исполнитель: \hfill Ситник Андрей Андреевич \\
+Научный руководитель: \hfill  Амосов Владимир Владимирович \\
+Рецензент: \hfill \\
+\end{flushleft}}
+
+\renewcommand{\ESKDtheTitleFieldX}{Санкт-Петербург 2001}
+
+\maketitle
 
 \tableofcontents
 
