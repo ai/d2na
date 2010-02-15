@@ -1830,8 +1830,6 @@ e = D2NA::Evolution.new do
       # Обнуляем переменные:
       # Сумма наших сроков наказания
       our_punishment = 0
-      # Сумма сроков наказания противника
-      opponent_punishment = 0
       # Наш ход
       our_choice = nil
       # Ход противника
@@ -1867,9 +1865,7 @@ e = D2NA::Evolution.new do
         # Получаем решение противника, передав ему
         # наше решение на прошло шаге и суммы сроков
         # его и наше наказания
-        opponent_choice = opponent.call(
-            our_previous_choice, opponent_punishment,
-            our_punishment)
+        opponent_choice = opponent.call(our_previous_choice)
         
         # Сохраняем наш ход
         our_previous_choice = input_name(our_choice)
@@ -1880,8 +1876,6 @@ e = D2NA::Evolution.new do
         
         # Наше наказание будет в первой строке …
         our_punishment += p.first
-        # противник — в последней
-        opponent_punishment += p.last
       end
       
       # Требуем генератор уменьшить наше наказание.
