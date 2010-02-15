@@ -7,3 +7,5 @@ It contain two subprojects:
 * D²NA&nbsp;Language[file:vm/README_rdoc.html] – simple, mutable programming language.
 * D²NA&nbsp;Evolution[file:evolution/README_rdoc.html] – tool to generate code on D²NA
   language.
+
+Presentation (on Russian): http://slideshare.net/iskin/dna-3184376
