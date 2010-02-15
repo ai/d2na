@@ -1,12 +1,7 @@
 #!/bin/sh
 
 while true; do
-    for i in images/*.dia; do
-        dia -t tex $i -e images/`basename $i .dia`.tex
-    done
-    pdflatex Аннотация.tex && pdflatex Диплом.tex
-    
-    rm *.log *.out images/*.tex
+    . ./build
     
     inotifywait -e MOVE_SELF,MODIFY,CLOSE_WRITE *.tex images/*.dia
     sleep 1
